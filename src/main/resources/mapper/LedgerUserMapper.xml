@@ -2,4 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.aixuxi.ledger.mapper.LedgerUserMapper">
 
+    <select id="getNavMenuIds" resultType="java.lang.Integer" parameterType="java.lang.Integer">
+        SELECT DISTINCT rm.menu_id
+        FROM ledger_user_role ur
+                 LEFT JOIN ledger_role_menu rm ON ur.role_id = rm.role_id
+        WHERE ur.user_id = #{userId}
+    </select>
+    <select id="listByMenuId" resultType="cn.aixuxi.ledger.entity.system.LedgerUser"
+            parameterType="java.lang.Integer">
+        SELECT DISTINCT su.*
+        FROM ledger_user_role ur
+                 LEFT JOIN ledger_role_menu rm ON ur.role_id = rm.role_id
+                 LEFT JOIN ledger_user su ON ur.user_id = su.id
+        WHERE rm.menu_id = #{menuId}
+    </select>
 </mapper>

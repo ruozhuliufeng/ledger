@@ -1,11 +1,14 @@
 package cn.aixuxi.ledger.entity.system;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @TableName("ledger_menu")
@@ -18,7 +21,7 @@ public class LedgerMenu implements Serializable {
     /**
      * 父级菜单
      */
-    private long parentId;
+    private Integer parentId;
     /**
      * 操作类型
      */
@@ -32,7 +35,7 @@ public class LedgerMenu implements Serializable {
      */
     private Integer category;
     /**
-     * 菜单编号
+     * 菜单编号(如：user:list,user:create)
      */
     private String code;
     /**
@@ -69,4 +72,7 @@ public class LedgerMenu implements Serializable {
      * 菜单资源
      */
     private String source;
+
+    @TableField(exist = false)
+    private List<LedgerMenu> childen = new ArrayList<>();
 }
