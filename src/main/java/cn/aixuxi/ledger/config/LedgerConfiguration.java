@@ -10,13 +10,4 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties({LedgerJwtProperties.class, LedgerWxProperties.class })
 public class LedgerConfiguration {
 
-    @Bean
-    public LedgerJwtProperties ledgerJwtProperties(){
-        return new LedgerJwtProperties();
-    }
-
-    @Bean
-    public LedgerWxProperties ledgerWxProperties(){
-        return new LedgerWxProperties();
-    }
 }

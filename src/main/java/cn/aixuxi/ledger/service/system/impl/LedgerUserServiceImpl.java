@@ -3,8 +3,8 @@ package cn.aixuxi.ledger.service.system.impl;
 import cn.aixuxi.ledger.entity.system.LedgerMenu;
 import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
+import cn.aixuxi.ledger.mapper.LedgerMenuMapper;
 import cn.aixuxi.ledger.mapper.LedgerUserMapper;
-import cn.aixuxi.ledger.service.system.LedgerMenuService;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.RedisUtil;
@@ -15,9 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static java.awt.SystemColor.menu;
-
 /**
  * 服务实现类
  *
@@ -29,7 +26,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
         implements LedgerUserService {
 
     private final LedgerRoleService roleService;
-    private final LedgerMenuService menuService;
+    private final LedgerMenuMapper menuMapper;
     private final RedisUtil redisUtil;
     private final static String GRANTED_AUTHORITY_KEY = "GrantedAuthority:";
 
@@ -69,7 +66,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
             // 获取菜单编码
             List<Integer> menuIds = this.baseMapper.getNavMenuIds(userId);
             if (menuIds.size() > 0) {
-                List<LedgerMenu> menuList = menuService.listByIds(menuIds);
+                List<LedgerMenu> menuList = menuMapper.selectBatchIds(menuIds);
                 String menuPerms = menuList.stream().map(LedgerMenu::getCode).collect(Collectors.joining(","));
                 authority = authority.concat(menuPerms);
             }

@@ -32,6 +32,7 @@ public class CaptchaFilter extends OncePerRequestFilter{
                 loginFailureHandler.onAuthenticationFailure(request, response, e);
             }
         }
+        filterChain.doFilter(request,response);
     }
 
     private void validate(HttpServletRequest httpServletRequest) {
