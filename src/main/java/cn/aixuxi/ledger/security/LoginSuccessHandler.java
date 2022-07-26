@@ -14,6 +14,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @AllArgsConstructor
@@ -27,8 +28,8 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         // 生成jwt,并放置到请求头中
         String jwt = jwtUtil.generateToken(authentication.getName());
         response.setHeader(jwtProperties.getHeader(), jwt);
-        Result result = Result.succeed();
-        outputStream.write(JSONUtil.toJsonStr(result).getBytes("UTF-8"));
+        Result<String> result = Result.succeed("登录成功",jwt);
+        outputStream.write(JSONUtil.toJsonStr(result).getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
         outputStream.close();
     }

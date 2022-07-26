@@ -1,11 +1,14 @@
 package cn.aixuxi.ledger.entity.system;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 角色信息
@@ -38,4 +41,10 @@ public class LedgerRole implements Serializable{
      * 排序
      */
     private Integer sort;
+
+    /**
+     * 菜单ID列表
+     */
+    @TableField(exist = false)
+    private List<Integer> menuIds = new ArrayList<>();
 }

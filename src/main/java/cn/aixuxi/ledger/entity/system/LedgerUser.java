@@ -2,12 +2,14 @@ package cn.aixuxi.ledger.entity.system;
 
 import cn.aixuxi.ledger.entity.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * 用户主表
@@ -65,4 +67,10 @@ public class LedgerUser extends BaseEntity {
      * 用户状态
      */
     private Integer status;
+
+    /**
+     * 用户角色
+     */
+    @TableField(exist = false)
+    private List<LedgerRole> roles;
 }

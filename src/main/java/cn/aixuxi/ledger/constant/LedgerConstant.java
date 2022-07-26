@@ -19,7 +19,7 @@ public interface LedgerConstant {
     /**
      * 默认密码
      */
-    String DEFAULT_PASSWORD = "123654";
+    String DEFULT_PASSWORD = "123654";
     /**
      * 默认头像地址
      */
