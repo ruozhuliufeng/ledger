@@ -2,6 +2,7 @@ package cn.aixuxi.ledger.security;
 
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.properties.LedgerJwtProperties;
+import cn.aixuxi.ledger.service.UserDetailsServiceImpl;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.JwtUtil;
 import cn.hutool.core.util.StrUtil;
@@ -29,7 +30,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter{
     @Autowired
     private JwtUtil jwtUtil;
     @Autowired
-    private UserDetailsService userDetailsService;
+    private UserDetailsServiceImpl userDetailsService;
     @Autowired
     private LedgerUserService userService;
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
@@ -54,7 +55,9 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter{
         // 获取用户的权限等信息
         LedgerUser user = userService.getByUsername(username);
         UsernamePasswordAuthenticationToken token
-                = new UsernamePasswordAuthenticationToken(username, null, userDetailsService.loadUserByUsername(username).getAuthorities());
+                = new UsernamePasswordAuthenticationToken(username, null, userDetailsService.getUserAuthority(user.getId()));
         SecurityContextHolder.getContext().setAuthentication(token);
+
+        chain.doFilter(request,response);
     }
 }

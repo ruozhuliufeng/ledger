@@ -25,6 +25,8 @@ import java.util.UUID;
 
 /**
  * 用户基础服务
+ *
+ * @author ruozhuliufeng
  */
 @RestController
 @AllArgsConstructor
