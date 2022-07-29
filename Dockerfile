@@ -4,6 +4,6 @@ EXPOSE 8888
 
 ADD target/ledger.jar app.jar
 
-RUN bash -c 'touch /app.jar'
+CMD java -jar app.jar
 
 ENTRYPOINT ["java","-jar","/app.jar"]
