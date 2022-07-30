@@ -8,21 +8,18 @@ import cn.aixuxi.ledger.entity.system.LedgerUserRole;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
-import cn.aixuxi.ledger.utils.RedisUtil;
-import cn.aixuxi.ledger.vo.LedgerUserVO;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.jsonwebtoken.lang.Assert;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +45,7 @@ public class LedgerUserController {
      * @return 用户信息
      */
     @GetMapping("/info/{id}")
-    public Result<LedgerUser> info(@PathVariable("id") Integer id) {
+    public Result<LedgerUser> info(@PathVariable("id") Long id) {
         LedgerUser user = userService.getById(id);
         Assert.notNull(user, "找不到该用户");
         List<LedgerRole> roles = roleService.listRolesByUserId(id);
@@ -69,9 +66,7 @@ public class LedgerUserController {
 
         Page<LedgerUser> pageData = userService.page(new Page<>(current, size), new QueryWrapper<LedgerUser>()
                 .like(StrUtil.isNotBlank(username), "account", username));
-        pageData.getRecords().forEach(item -> {
-            item.setRoles(roleService.listRolesByUserId(item.getId()));
-        });
+        pageData.getRecords().forEach(item -> item.setRoles(roleService.listRolesByUserId(item.getId())));
         return Result.succeed(pageData);
     }
 
@@ -127,9 +122,9 @@ public class LedgerUserController {
      * @param roleIds 角色ID列表
      */
     @PostMapping("/role/{userId}")
-    public Result rolePerm(@PathVariable("userId") Integer userId, @RequestBody List<Integer> roleIds) {
+    public Result rolePerm(@PathVariable("userId") Long userId, @RequestBody Long[] roleIds) {
         List<LedgerUserRole> userRoles = new ArrayList<>();
-        roleIds.forEach(roleId -> {
+        Arrays.asList(roleIds).forEach(roleId -> {
             LedgerUserRole userRole = new LedgerUserRole();
             userRole.setUserId(userId);
             userRole.setRoleId(roleId);

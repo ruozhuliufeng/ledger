@@ -17,5 +17,5 @@ public interface LedgerRoleService extends IService<LedgerRole> {
      * @param userId 用户ID
      * @return 用户角色信息
      */
-    List<LedgerRole> listRolesByUserId(Integer userId);
+    List<LedgerRole> listRolesByUserId(Long userId);
 }

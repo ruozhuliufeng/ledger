@@ -11,7 +11,7 @@ import java.util.Collection;
  */
 public class AccountUser implements UserDetails {
 
-	private Integer userId;
+	private Long userId;
 
 	private String password;
 
@@ -27,12 +27,12 @@ public class AccountUser implements UserDetails {
 
 	private final boolean enabled;
 
-	public AccountUser(Integer userId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+	public AccountUser(Long userId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
 		this(userId, username, password, true, true, true, true, authorities);
 	}
 
 
-	public AccountUser(Integer userId, String username, String password, boolean enabled, boolean accountNonExpired,
+	public AccountUser(Long userId, String username, String password, boolean enabled, boolean accountNonExpired,
                        boolean credentialsNonExpired, boolean accountNonLocked,
                        Collection<? extends GrantedAuthority> authorities) {
 		Assert.isTrue(username != null && !"".equals(username) && password != null,

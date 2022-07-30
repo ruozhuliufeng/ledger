@@ -17,7 +17,7 @@ public interface LedgerUserMapper extends BaseMapper<LedgerUser> {
      * @param userId 用户ID
      * @return 菜单ID列表
      */
-    List<Integer> getNavMenuIds(Integer userId);
+    List<Integer> getNavMenuIds(Long userId);
 
     /**
      * 根据菜单ID查询用户列表
@@ -25,5 +25,5 @@ public interface LedgerUserMapper extends BaseMapper<LedgerUser> {
      * @param menuId 菜单ID
      * @return 用户列表
      */
-    List<LedgerUser> listByMenuId(Integer menuId);
+    List<LedgerUser> listByMenuId(Long menuId);
 }

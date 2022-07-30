@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ * Jwt工具类
+ *
+ * @author ruozhuliufeng
+ */
 @RequiredArgsConstructor
 @Component
 public class JwtUtil {

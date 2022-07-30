@@ -21,10 +21,10 @@ public class LedgerRoleMenu implements Serializable {
     /**
      * 角色ID
      */
-    private Integer roleId;
+    private Long roleId;
 
     /**
      * 菜单ID
      */
-    private Integer menuId;
+    private Long menuId;
 }

@@ -56,7 +56,7 @@ public class LedgerMenuController {
      * @return 菜单信息
      */
     @GetMapping("/info/{id}")
-    public Result<LedgerMenu> info(@PathVariable("id") Integer id) {
+    public Result<LedgerMenu> info(@PathVariable("id") Long id) {
         return Result.succeed(menuService.getById(id));
     }
 
@@ -103,7 +103,7 @@ public class LedgerMenuController {
      * @param id 菜单ID
      */
     @PostMapping("/delete/{id}")
-    public Result delete(@PathVariable("id") Integer id) {
+    public Result delete(@PathVariable("id") Long id) {
         int count = menuService.count(new QueryWrapper<LedgerMenu>().eq("parent_id", id));
         if (count > 0) {
             return Result.failed("请先删除子菜单");

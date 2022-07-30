@@ -23,7 +23,7 @@ public interface LedgerUserService extends IService<LedgerUser> {
      * @param userId 用户id
      * @return 用户权限信息
      */
-    String getUserAuthorityInfo(Integer userId);
+    String getUserAuthorityInfo(Long userId);
 
     /**
      * 清除用户权限信息
@@ -37,12 +37,12 @@ public interface LedgerUserService extends IService<LedgerUser> {
      *
      * @param roleId 角色id
      */
-    void clearUserAuthorityInfoByRoleId(Integer roleId);
+    void clearUserAuthorityInfoByRoleId(Long roleId);
 
     /**
      * 根据菜单id清除用户权限信息
      *
      * @param menuId 菜单id
      */
-    void clearUserAuthorityInfoByMenuId(Integer menuId);
+    void clearUserAuthorityInfoByMenuId(Long menuId);
 }

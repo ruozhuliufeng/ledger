@@ -17,11 +17,11 @@ public class LedgerMenu implements Serializable {
      * 主键
      */
     @TableId(value = "id",type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     /**
      * 父级菜单
      */
-    private Integer parentId = 0;
+    private Long parentId = 0L;
     /**
      * 操作类型
      */

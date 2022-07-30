@@ -20,7 +20,7 @@ public class LedgerRole implements Serializable{
      * 主键
      */
     @TableId(value = "id",type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     /**
      * 是否删除
      */
@@ -28,7 +28,7 @@ public class LedgerRole implements Serializable{
     /**
      * 上级ID
      */
-    private Integer parentId;
+    private Long parentId;
     /**
      * 角色编码
      */
@@ -46,5 +46,5 @@ public class LedgerRole implements Serializable{
      * 菜单ID列表
      */
     @TableField(exist = false)
-    private List<Integer> menuIds = new ArrayList<>();
+    private List<Long> menuIds = new ArrayList<>();
 }

@@ -25,7 +25,7 @@ public class LedgerRoleServiceImpl extends ServiceImpl<LedgerRoleMapper, LedgerR
      * @return 用户角色信息
      */
     @Override
-    public List<LedgerRole> listRolesByUserId(Integer userId) {
+    public List<LedgerRole> listRolesByUserId(Long userId) {
         List<LedgerRole> roleList = this.list(
                 new QueryWrapper<LedgerRole>()
                         .inSql("id","select role_id from ledger_user_role where user_id = " + userId)

@@ -48,7 +48,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
      * @return 用户权限信息
      */
     @Override
-    public String getUserAuthorityInfo(Integer userId) {
+    public String getUserAuthorityInfo(Long userId) {
         LedgerUser user = this.getById(userId);
         // ROLE_admin,sys:user:list,....
         String authority = "";
@@ -91,7 +91,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
      * @param roleId 角色id
      */
     @Override
-    public void clearUserAuthorityInfoByRoleId(Integer roleId) {
+    public void clearUserAuthorityInfoByRoleId(Long roleId) {
         List<LedgerUser> userList = this.list(
                 new QueryWrapper<LedgerUser>()
                         .inSql("id", "select user_id from ledger_user_role where role_id = " + roleId)
@@ -107,7 +107,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
      * @param menuId 菜单id
      */
     @Override
-    public void clearUserAuthorityInfoByMenuId(Integer menuId) {
+    public void clearUserAuthorityInfoByMenuId(Long menuId) {
         List<LedgerUser> userList = this.baseMapper.listByMenuId(menuId);
         userList.forEach(user -> {
             this.clearUserAuthorityInfo(user.getAccount());

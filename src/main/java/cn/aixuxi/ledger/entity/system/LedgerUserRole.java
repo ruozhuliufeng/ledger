@@ -14,13 +14,13 @@ public class LedgerUserRole implements Serializable{
      * 主键
      */
     @TableId(value = "id",type = IdType.AUTO)
-    private Integer id;
+    private Long id;
     /**
      * 用户id
      */
-    private Integer userId;
+    private Long userId;
     /**
      * 角色ID
      */
-    private Integer roleId;
+    private Long roleId;
 }

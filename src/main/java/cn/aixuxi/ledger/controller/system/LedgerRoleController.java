@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -44,11 +45,11 @@ public class LedgerRoleController {
      * @return 角色信息
      */
     @GetMapping("/info/{id}")
-    public Result<LedgerRole> info(@PathVariable("id") Integer id) {
+    public Result<LedgerRole> info(@PathVariable("id") Long id) {
         LedgerRole role = roleService.getById(id);
         // 获取角色相关联的菜单ID
         List<LedgerRoleMenu> roleMenuList = roleMenuService.list(new QueryWrapper<LedgerRoleMenu>().eq("role_id", id));
-        List<Integer> menuIds = roleMenuList.stream().map(LedgerRoleMenu::getMenuId).collect(Collectors.toList());
+        List<Long> menuIds = roleMenuList.stream().map(LedgerRoleMenu::getMenuId).collect(Collectors.toList());
 
         role.setMenuIds(menuIds);
         return Result.succeed(role);
@@ -100,7 +101,7 @@ public class LedgerRoleController {
      * @param ids 角色ID列表
      */
     @PostMapping("/delete")
-    public Result delete(@RequestBody List<Integer> ids) {
+    public Result delete(@RequestBody List<Long> ids) {
         roleService.removeByIds(ids);
         // 删除中间表
         userRoleService.remove(new QueryWrapper<LedgerUserRole>().in("role_id", ids));
@@ -120,9 +121,9 @@ public class LedgerRoleController {
      * @param menuIds 菜单ID列表
      */
     @PostMapping("/perms/{roleId}")
-    public Result<List<Integer>> perms(@PathVariable("roleId") Integer roleId, @RequestBody List<Integer> menuIds) {
+    public Result perms(@PathVariable("roleId") Long roleId, @RequestBody Long[] menuIds) {
         List<LedgerRoleMenu> roleMenuList = new ArrayList<>();
-        menuIds.forEach(menuId -> {
+        Arrays.asList(menuIds).forEach(menuId -> {
             LedgerRoleMenu roleMenu = new LedgerRoleMenu();
             roleMenu.setMenuId(menuId);
             roleMenu.setRoleId(roleId);
@@ -135,7 +136,7 @@ public class LedgerRoleController {
 
         // 删除缓存
         userService.clearUserAuthorityInfoByRoleId(roleId);
-        return Result.succeed(menuIds);
+        return Result.succeed();
     }
 
 }
