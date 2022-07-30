@@ -18,7 +18,7 @@ import java.util.List;
  */
 @Data
 public class LedgerMenuDTO implements Serializable{
-    private Integer id;
+    private Long id;
     private String name;
     private String title;
     private String icon;
