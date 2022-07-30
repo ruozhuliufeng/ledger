@@ -69,9 +69,10 @@ public class LedgerMenuServiceImpl extends ServiceImpl<LedgerMenuMapper, LedgerM
             menuDTO.setName(menu.getName());
             menuDTO.setPath(menu.getPath());
             menuDTO.setComponent(menu.getComponent());
-            if (menu.getChilden().size() > 0){
+            menuDTO.setIcon(menu.getSource());
+            if (menu.getChildren().size() > 0){
                 // 子节点调用当前方法再次进行转换
-                menuDTO.setChildren(convert(menu.getChilden()));
+                menuDTO.setChildren(convert(menu.getChildren()));
             }
             menuDTOList.add(menuDTO);
         });
@@ -84,7 +85,7 @@ public class LedgerMenuServiceImpl extends ServiceImpl<LedgerMenuMapper, LedgerM
         for (LedgerMenu menu : menuList) {
             for (LedgerMenu child : menuList) {
                 if (child.getParentId().equals(menu.getId())) {
-                    menu.getChilden().add(child);
+                    menu.getChildren().add(child);
                 }
             }
             // 提取父节点

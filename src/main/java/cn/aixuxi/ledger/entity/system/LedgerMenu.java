@@ -21,7 +21,7 @@ public class LedgerMenu implements Serializable {
     /**
      * 父级菜单
      */
-    private Integer parentId;
+    private Integer parentId = 0;
     /**
      * 操作类型
      */
@@ -31,7 +31,7 @@ public class LedgerMenu implements Serializable {
      */
     private String alias;
     /**
-     * 菜单类型
+     * 菜单类型 0：菜单 1：按钮
      */
     private Integer category;
     /**
@@ -69,10 +69,13 @@ public class LedgerMenu implements Serializable {
      */
     private Integer sort;
     /**
-     * 菜单资源
+     * 菜单资源(图标)
      */
     private String source;
 
+    /**
+     * 子菜单项
+     */
     @TableField(exist = false)
-    private List<LedgerMenu> childen = new ArrayList<>();
+    private List<LedgerMenu> children = new ArrayList<>();
 }
