@@ -62,7 +62,7 @@ public class LedgerUserController {
      * @param username 用户名
      * @return 分页用户数据
      */
-    @PostMapping("/list")
+    @GetMapping("/list")
     public Result<Page<LedgerUser>> list(String username) {
         int current = ServletRequestUtils.getIntParameter(request, "current", 1);
         int size = ServletRequestUtils.getIntParameter(request, "size", 10);

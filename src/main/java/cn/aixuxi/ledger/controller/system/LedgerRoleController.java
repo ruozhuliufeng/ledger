@@ -60,7 +60,7 @@ public class LedgerRoleController {
      * @param name 角色名称
      * @return 角色列表
      */
-    @PostMapping("list")
+    @GetMapping("list")
     public Result<Page<LedgerRole>> list(String name) {
         int current = ServletRequestUtils.getIntParameter(request, "current", 1);
         int size = ServletRequestUtils.getIntParameter(request, "size", 10);
