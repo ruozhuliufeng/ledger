@@ -15,6 +15,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Component
 @AllArgsConstructor
@@ -30,11 +31,10 @@ public class JwtLogoutSuccessHandler implements LogoutSuccessHandler {
         }
         response.setContentType("application/json;charset=UTF-8");
         ServletOutputStream outputStream = response.getOutputStream();
-        // 生成jwt,并放置到请求头中
-        String jwt = jwtUtil.generateToken(authentication.getName());
+        // 清空请求头中中的token
         response.setHeader(jwtProperties.getHeader(), "");
         Result result = Result.succeed();
-        outputStream.write(JSONUtil.toJsonStr(result).getBytes("UTF-8"));
+        outputStream.write(JSONUtil.toJsonStr(result).getBytes(StandardCharsets.UTF_8));
         outputStream.flush();
         outputStream.close();
     }
