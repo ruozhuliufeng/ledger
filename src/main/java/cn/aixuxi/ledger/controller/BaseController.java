@@ -6,8 +6,11 @@ import cn.aixuxi.ledger.dto.PassDTO;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.RedisUtil;
-import com.google.code.kaptcha.Producer;
+//import com.google.code.kaptcha.Producer;
+import com.wf.captcha.SpecCaptcha;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -28,29 +31,25 @@ import java.util.UUID;
  *
  * @author ruozhuliufeng
  */
+@Slf4j
 @RestController
 @AllArgsConstructor
 @RequestMapping("/base")
 public class BaseController {
     private final RedisUtil redisUtil;
-    private final Producer producer;
+//    private final Producer producer;
     private final LedgerUserService userService;
     private final PasswordEncoder passwordEncoder;
 
     @GetMapping("/captcha")
     public Result<Map<String,Object>> captcha() throws IOException {
         String key = UUID.randomUUID().toString();
-        String code = producer.createText();
-        BufferedImage image = producer.createImage(code);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(image,"jpg",outputStream);
-        BASE64Encoder encoder = new BASE64Encoder();
-        String str = "data:image/jpeg;base64,";
-        String base64Img = str + encoder.encode(outputStream.toByteArray());
+        SpecCaptcha specCaptcha = new SpecCaptcha(120,40,5);
+        String code = specCaptcha.text().toLowerCase();
         redisUtil.hset(LedgerConstant.CAPTCHA_KEY,key,code,180);
         Map<String,Object> result = new HashMap<>();
         result.put("token",key);
-        result.put("captchaImg",base64Img);
+        result.put("captchaImg",specCaptcha.toBase64());
         return Result.succeed(result);
     }
 

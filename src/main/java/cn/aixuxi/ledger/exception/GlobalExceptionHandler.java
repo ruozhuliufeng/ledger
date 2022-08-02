@@ -26,21 +26,21 @@ public class GlobalExceptionHandler {
         BindingResult result = e.getBindingResult();
         ObjectError objectError = result.getAllErrors().stream().findFirst().get();
 
-        log.error("实体校验异常：----------------{}", objectError.getDefaultMessage());
+        log.error("Method Argument Not Valid Exception：----------------{}", objectError.getDefaultMessage());
         return Result.failed(objectError.getDefaultMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = IllegalArgumentException.class)
     public Result handler(IllegalArgumentException e) {
-        log.error("Assert异常：----------------{}", e.getMessage());
+        log.error("Illegal Argument Exception：----------------{}", e.getMessage());
         return Result.failed(e.getMessage());
     }
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = RuntimeException.class)
     public Result handler(RuntimeException e) {
-        log.error("运行时异常：----------------{}", e.getMessage());
+        log.error("Runtime Exception：----------------{}", e.getMessage());
         return Result.failed(e.getMessage());
     }
 }
