@@ -96,6 +96,26 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
     }
 
     /**
+     * 新建交易记录
+     *
+     * @param record 记录信息
+     */
+    @Override
+    public boolean saveRecord(LedgerRecord record) {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LedgerUser user = userService.getByUsername(username);
+        record.setUserId(user.getId());
+        if (StrUtil.isBlank(record.getTransactionSn())){
+            // 当前时间精确到毫秒，防止他人创建时相同
+            String transactionSn = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSS").format(System.currentTimeMillis());
+            record.setTransactionSn(transactionSn);
+        }
+        record.setCreateTime(new Date());
+        record.setUpdateTime(new Date());
+        return this.save(record);
+    }
+
+    /**
      * 支付宝账单转换
      *
      * @param rows   导入支付宝账单数据

@@ -68,10 +68,7 @@ public class LedgerRecordController {
      */
     @PostMapping("/save")
     public Result<LedgerRecord> save(@Validated @RequestBody LedgerRecord record) {
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LedgerUser user = userService.getByUsername(username);
-        record.setUserId(user.getId());
-        recordService.save(record);
+        recordService.saveRecord(record);
         return Result.succeed(record);
     }
 
