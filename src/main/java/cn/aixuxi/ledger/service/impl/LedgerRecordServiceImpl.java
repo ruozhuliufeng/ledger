@@ -148,6 +148,7 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 record.setTransactionTime(simpleDateFormat.parse(csvRow.get(10)));
             }
+            record.setUserId(userId);
             record.setCreateTime(new Date());
             record.setCreateUser(userId);
             record.setUpdateTime(new Date());
