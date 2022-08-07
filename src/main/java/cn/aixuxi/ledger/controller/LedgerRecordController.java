@@ -2,26 +2,25 @@ package cn.aixuxi.ledger.controller;
 
 import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.entity.LedgerRecord;
+import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.service.LedgerRecordService;
-import cn.aixuxi.ledger.service.system.LedgerUserRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
- * 系统管理-角色管理
+ * 系统管理-交易管理
  *
  * @author ruozhuliufeng
  */
@@ -33,13 +32,12 @@ public class LedgerRecordController {
     private final LedgerRecordService recordService;
     private final LedgerUserService userService;
     private final HttpServletRequest request;
-    private final LedgerUserRoleService userRoleService;
 
     /**
-     * 角色信息
+     * 交易信息
      *
-     * @param id 角色ID
-     * @return 角色信息
+     * @param id 交易ID
+     * @return 交易信息
      */
     @GetMapping("/info/{id}")
     public Result<LedgerRecord> info(@PathVariable("id") Long id) {
@@ -48,10 +46,10 @@ public class LedgerRecordController {
     }
 
     /**
-     * 角色列表
+     * 交易列表
      *
-     * @param name 角色名称
-     * @return 角色列表
+     * @param name 交易名称
+     * @return 交易列表
      */
     @GetMapping("list")
     public Result<Page<LedgerRecord>> list(String name) {
@@ -64,20 +62,23 @@ public class LedgerRecordController {
     }
 
     /**
-     * 新建角色
+     * 新建交易
      *
-     * @param record 角色信息
+     * @param record 交易信息
      */
     @PostMapping("/save")
     public Result<LedgerRecord> save(@Validated @RequestBody LedgerRecord record) {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LedgerUser user = userService.getByUsername(username);
+        record.setUserId(user.getId());
         recordService.save(record);
         return Result.succeed(record);
     }
 
     /**
-     * 更新角色
+     * 更新交易
      *
-     * @param record 角色信息
+     * @param record 交易信息
      */
     @PostMapping("/update")
     public Result<LedgerRecord> update(@Validated @RequestBody LedgerRecord record) {
@@ -88,9 +89,9 @@ public class LedgerRecordController {
     }
 
     /**
-     * 批量删除角色信息
+     * 批量删除交易信息
      *
-     * @param ids 角色ID列表
+     * @param ids 交易ID列表
      */
     @PostMapping("/delete")
     public Result delete(@RequestBody List<Long> ids) {
@@ -101,12 +102,18 @@ public class LedgerRecordController {
 
     /**
      * 微信/支付宝账单导入
-     * @param files 导入ZIP文件
+     *
+     * @param file     导入ZIP文件
      * @param password 解压密码
      */
     @PostMapping("/import/third/recod")
-    public Result importRecordByThird(@RequestBody MultipartFile[] files,String password){
-        recordService.importRecordByThird(files,password);
+    public Result importRecordByThird(@RequestBody MultipartFile file, String password) {
+        if (ObjectUtils.isEmpty(file)) {
+            return Result.failed("文件信息不能为空");
+        }
+        recordService.importRecordByThird(file, password);
         return Result.succeed();
     }
+
+    // TODO 提供导入模板，导入数据
 }

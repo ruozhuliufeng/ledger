@@ -75,7 +75,7 @@ public class LedgerRecord extends BaseEntity {
     /**
      * 商品单号
      */
-    private String merchatOrderSn;
+    private String merchantOrderSn;
 
     /**
      * 交易对方账户

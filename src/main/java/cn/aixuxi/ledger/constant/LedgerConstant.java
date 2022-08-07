@@ -24,4 +24,20 @@ public interface LedgerConstant {
      * 默认头像地址
      */
     String DEFULT_AVATAR = "https://image-1300566513.cos.ap-guangzhou.myqcloud.com/upload/images/5a9f48118166308daba8b6da7e466aab.jpg";
+
+    String UPLOAD_PATH_PREFIX_STATIC = "static";
+
+    String UPLOAD_PATH_PREFIX_UPLOAD_FILE = "uploadFile";
+    /**
+     * 压缩文件类型
+     */
+    String FILE_TYPE_ZIP = "ZIP";
+    /**
+     * 微信账单
+     */
+    String LEDGER_WECHAT = "微信";
+    /**
+     * 支付宝账单
+     */
+    String LEDGER_ALIPAY = "alipay";
 }
