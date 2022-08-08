@@ -41,57 +41,59 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
 
     @SneakyThrows
     @Override
-    public void importRecordByThird(MultipartFile file, String password) {
-        // 登录用户
-        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        LedgerUser user = userService.getByUsername(username);
-        // 获取文件类型，取后缀
-        String filename = file.getOriginalFilename();
-        String suffix = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
-        // 获取当前路径
-        String path = new File((ResourceUtils.getURL("classpath:").getPath())).getAbsolutePath();
-        String filePath = path + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_STATIC + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_UPLOAD_FILE + File.separator;
-        File temp = new File(filePath);
-        if (!temp.exists()) {
-            temp.mkdirs();
-        }
-        // 临时文件
-        File localFile = new File(filePath + filename);
-        // 把上传的文件保存到本地
-        file.transferTo(localFile);
-        log.info(filename + " 上传成功");
-        List<File> fileList = new ArrayList<>();
-        // 如果是压缩文件，获取解压文件
-        if (suffix.equals(LedgerConstant.FILE_TYPE_ZIP)) {
-            fileList.addAll(ZipUtil.unzipFile(localFile, filePath, password));
-        } else {
-            fileList.add(localFile);
-        }
-        List<LedgerRecord> recordList = new ArrayList<>();
-        for (File importFile : fileList) {
-            CsvReader reader = new CsvReader(importFile, CsvReadConfig.defaultConfig());
-            List<CsvRow> rows = reader.read().getRows();
-            // 微信账单处理
-            if (importFile.getName().startsWith(LedgerConstant.LEDGER_WECHAT)) {
-                recordList = transformByWeChat(rows, user.getId());
-            } else if (importFile.getName().startsWith(LedgerConstant.LEDGER_ALIPAY)) {
-                recordList = transformByAliPay(rows, user.getId());
+    public void importRecordByThird(MultipartFile[] files, String password) {
+        for (MultipartFile file : files) {
+            // 登录用户
+            String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            LedgerUser user = userService.getByUsername(username);
+            // 获取文件类型，取后缀
+            String filename = file.getOriginalFilename();
+            String suffix = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+            // 获取当前路径
+            String path = new File((ResourceUtils.getURL("classpath:").getPath())).getAbsolutePath();
+            String filePath = path + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_STATIC + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_UPLOAD_FILE + File.separator;
+            File temp = new File(filePath);
+            if (!temp.exists()) {
+                temp.mkdirs();
             }
-            // 保存数据
-            this.saveBatch(recordList);
-            // 删除文件
-            FileUtil.del(importFile);
-        }
-        FileUtil.del(localFile);
-        try {
-            // 删除空目录
-            for (File f : FileUtil.ls(filePath)) {
-                if (FileUtil.isDirEmpty(f)) {
-                    FileUtil.del(f);
+            // 临时文件
+            File localFile = new File(filePath + filename);
+            // 把上传的文件保存到本地
+            file.transferTo(localFile);
+            log.info(filename + " 上传成功");
+            List<File> fileList = new ArrayList<>();
+            // 如果是压缩文件，获取解压文件
+            if (suffix.equals(LedgerConstant.FILE_TYPE_ZIP)) {
+                fileList.addAll(ZipUtil.unzipFile(localFile, filePath, password));
+            } else {
+                fileList.add(localFile);
+            }
+            List<LedgerRecord> recordList = new ArrayList<>();
+            for (File importFile : fileList) {
+                CsvReader reader = new CsvReader(importFile, CsvReadConfig.defaultConfig());
+                List<CsvRow> rows = reader.read().getRows();
+                // 微信账单处理
+                if (importFile.getName().startsWith(LedgerConstant.LEDGER_WECHAT)) {
+                    recordList = transformByWeChat(rows, user.getId());
+                } else if (importFile.getName().startsWith(LedgerConstant.LEDGER_ALIPAY)) {
+                    recordList = transformByAliPay(rows, user.getId());
                 }
+                // 保存数据
+                this.saveBatch(recordList);
+                // 删除文件
+                FileUtil.del(importFile);
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
+            FileUtil.del(localFile);
+            try {
+                // 删除空目录
+                for (File f : FileUtil.ls(filePath)) {
+                    if (FileUtil.isDirEmpty(f)) {
+                        FileUtil.del(f);
+                    }
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
         }
     }
 
@@ -105,7 +107,7 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         LedgerUser user = userService.getByUsername(username);
         record.setUserId(user.getId());
-        if (StrUtil.isBlank(record.getTransactionSn())){
+        if (StrUtil.isBlank(record.getTransactionSn())) {
             // 当前时间精确到毫秒，防止他人创建时相同
             String transactionSn = new SimpleDateFormat("yyyyMMddHHmmssSSSSSSSS").format(System.currentTimeMillis());
             record.setTransactionSn(transactionSn);
@@ -186,7 +188,7 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
      * @return 转换后的数据
      */
     @SneakyThrows
-    private List<LedgerRecord> transformByWeChat(List<CsvRow> rows, Long userId){
+    private List<LedgerRecord> transformByWeChat(List<CsvRow> rows, Long userId) {
         List<LedgerRecord> recordList = new ArrayList<>();
         for (int i = 17; i < rows.size(); i++) {
             CsvRow csvRow = rows.get(i);

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 系统管理-交易管理
@@ -100,17 +101,28 @@ public class LedgerRecordController {
     /**
      * 微信/支付宝账单导入
      *
-     * @param file     导入ZIP文件
+     * @param files     导入ZIP文件
      * @param password 解压密码
      */
-    @PostMapping("/import/third/recod")
-    public Result importRecordByThird(@RequestBody MultipartFile file, String password) {
-        if (ObjectUtils.isEmpty(file)) {
+    @PostMapping("/import/third/record")
+    public Result importRecordByThird(@RequestParam(value = "files",required = true) MultipartFile[] files,@RequestParam(value = "password",required = false) String password) {
+        if (ObjectUtils.isEmpty(files)) {
             return Result.failed("文件信息不能为空");
         }
-        recordService.importRecordByThird(file, password);
+        recordService.importRecordByThird(files, password);
         return Result.succeed();
     }
 
+    /**
+     * 查询交易分类列表
+     *
+     * @return 交易分类列表
+     */
+    @GetMapping("/query/category/list")
+    public Result<List<String>> queryCategoryList() {
+        List<LedgerRecord> recordList = recordService.list();
+        List<String> categoryNames = recordList.stream().map(LedgerRecord::getTransactionCategory).collect(Collectors.toList());
+        return Result.succeed(categoryNames);
+    }
     // TODO 提供导入模板，导入数据
 }
