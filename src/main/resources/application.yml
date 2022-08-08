@@ -25,8 +25,8 @@ spring:
       min-evictable-idle-time-millis: 300000
       stat-view-servlet:
         enabled: true
-        login-username: zhisuan
-        login-password: 1qaz@WSX
+        login-username: root
+        login-password: 123!654
       web-stat-filter:
         enabled: true
         url-pattern: /*
