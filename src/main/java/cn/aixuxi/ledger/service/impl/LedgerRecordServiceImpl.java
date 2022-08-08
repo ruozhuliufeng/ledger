@@ -8,6 +8,7 @@ import cn.aixuxi.ledger.mapper.LedgerRecordMapper;
 import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.ZipUtil;
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.csv.CsvData;
 import cn.hutool.core.text.csv.CsvReadConfig;
@@ -41,60 +42,83 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
 
     @SneakyThrows
     @Override
-    public void importRecordByThird(MultipartFile[] files, String password) {
-        for (MultipartFile file : files) {
-            // 登录用户
-            String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            LedgerUser user = userService.getByUsername(username);
-            // 获取文件类型，取后缀
-            String filename = file.getOriginalFilename();
-            String suffix = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
-            // 获取当前路径
-            String path = new File((ResourceUtils.getURL("classpath:").getPath())).getAbsolutePath();
-            String filePath = path + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_STATIC + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_UPLOAD_FILE + File.separator;
-            File temp = new File(filePath);
-            if (!temp.exists()) {
-                temp.mkdirs();
-            }
-            // 临时文件
-            File localFile = new File(filePath + filename);
-            // 把上传的文件保存到本地
-            file.transferTo(localFile);
-            log.info(filename + " 上传成功");
-            List<File> fileList = new ArrayList<>();
-            // 如果是压缩文件，获取解压文件
-            if (suffix.equals(LedgerConstant.FILE_TYPE_ZIP)) {
-                fileList.addAll(ZipUtil.unzipFile(localFile, filePath, password));
-            } else {
-                fileList.add(localFile);
-            }
-            List<LedgerRecord> recordList = new ArrayList<>();
-            for (File importFile : fileList) {
-                CsvReader reader = new CsvReader(importFile, CsvReadConfig.defaultConfig());
-                List<CsvRow> rows = reader.read().getRows();
-                // 微信账单处理
-                if (importFile.getName().startsWith(LedgerConstant.LEDGER_WECHAT)) {
-                    recordList = transformByWeChat(rows, user.getId());
-                } else if (importFile.getName().startsWith(LedgerConstant.LEDGER_ALIPAY)) {
-                    recordList = transformByAliPay(rows, user.getId());
-                }
-                // 保存数据
-                this.saveBatch(recordList);
-                // 删除文件
-                FileUtil.del(importFile);
-            }
-            FileUtil.del(localFile);
-            try {
-                // 删除空目录
-                for (File f : FileUtil.ls(filePath)) {
-                    if (FileUtil.isDirEmpty(f)) {
-                        FileUtil.del(f);
-                    }
-                }
-            } catch (Exception e) {
-                log.error(e.getMessage());
-            }
+    public void importRecordByThird(MultipartFile file, String password) {
+        // 登录用户
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LedgerUser user = userService.getByUsername(username);
+        // 获取文件类型，取后缀
+        String filename = file.getOriginalFilename();
+        String suffix = filename.substring(filename.lastIndexOf(".") + 1).toUpperCase();
+        // 获取当前路径
+        String path = new File((ResourceUtils.getURL("classpath:").getPath())).getAbsolutePath();
+        String filePath = path + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_STATIC + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_UPLOAD_FILE + File.separator;
+        File temp = new File(filePath);
+        if (!temp.exists()) {
+            temp.mkdirs();
         }
+        // 临时文件
+        File localFile = new File(filePath + filename);
+        // 把上传的文件保存到本地
+        file.transferTo(localFile);
+        log.info(filename + " 上传成功");
+        List<File> fileList = new ArrayList<>();
+        // 如果是压缩文件，获取解压文件
+        if (suffix.equals(LedgerConstant.FILE_TYPE_ZIP)) {
+            fileList.addAll(ZipUtil.unzipFile(localFile, filePath, password));
+        } else {
+            fileList.add(localFile);
+        }
+        List<LedgerRecord> recordList = new ArrayList<>();
+        for (File importFile : fileList) {
+            CsvReader reader = new CsvReader(importFile, CsvReadConfig.defaultConfig());
+            List<CsvRow> rows = reader.read().getRows();
+            // 微信账单处理
+            if (importFile.getName().startsWith(LedgerConstant.LEDGER_WECHAT)) {
+                recordList = transformByWeChat(rows, user.getId());
+            } else if (importFile.getName().startsWith(LedgerConstant.LEDGER_ALIPAY)) {
+                recordList = transformByAliPay(rows, user.getId());
+            }
+            // 保存数据
+            saveOrUpdateRecordList(recordList, 1000);
+            // 删除文件
+            FileUtil.del(importFile);
+        }
+        FileUtil.del(localFile);
+        try {
+            // 删除空目录
+            for (File f : FileUtil.ls(filePath)) {
+                if (FileUtil.isDirEmpty(f)) {
+                    FileUtil.del(f);
+                }
+            }
+        } catch (Exception e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 更新或保存数据
+     *
+     * @param recordList 交易记录数据
+     * @param batchSize  批量处理数据
+     */
+    private boolean saveOrUpdateRecordList(List<LedgerRecord> recordList, int batchSize) {
+        if (CollUtil.isEmpty(recordList)) {
+            return false;
+        }
+        batchSize = batchSize == 0 ? 1000 : batchSize;
+        int totalSize = recordList.size();
+        int mod = totalSize / batchSize;
+        // 批量处理
+        for (int i = 0; i < mod + 1; i++) {
+            if (i == mod) {
+                this.baseMapper.saveOrUpdateRecordList(recordList.subList(i * batchSize, totalSize));
+            } else {
+                this.baseMapper.saveOrUpdateRecordList(recordList.subList(i * batchSize, (i + 1) * batchSize));
+            }
+
+        }
+        return true;
     }
 
     /**
@@ -129,12 +153,12 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
         List<LedgerRecord> recordList = new ArrayList<>();
         for (int i = 1; i < rows.size(); i++) {
             CsvRow csvRow = rows.get(i);
-            if (csvRow.size() != 11) {
-                break;
-            }
+//            if (csvRow.size() != 12) {
+//                break;
+//            }
             LedgerRecord record = new LedgerRecord();
             // 收/支
-            if (StrUtil.isNotBlank(csvRow.get(0))) {
+            if (StrUtil.isBlank(csvRow.get(0))) {
                 record.setTransactionType(TransactionTypeEnum.OTHER.getCode());
             } else {
                 if (StrUtil.equals(csvRow.get(0).trim(), TransactionTypeEnum.INCOME.getMessage())) {
@@ -162,9 +186,9 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
             // 交易分类
             record.setTransactionCategory(csvRow.get(7));
             // 交易订单号
-            record.setTransactionSn(csvRow.get(8));
+            record.setTransactionSn(csvRow.get(8).trim());
             // 商家订单号
-            record.setMerchantOrderSn(csvRow.get(9));
+            record.setMerchantOrderSn(csvRow.get(9).trim());
             // 交易时间
             if (StrUtil.isNotBlank(csvRow.get(10))) {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -210,7 +234,7 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
             // 商品
             record.setProductName(csvRow.get(3));
             // 收/支
-            if (StrUtil.isNotBlank(csvRow.get(4))) {
+            if (StrUtil.isBlank(csvRow.get(4))) {
                 record.setTransactionType(TransactionTypeEnum.OTHER.getCode());
             } else {
                 if (StrUtil.equals(csvRow.get(4).trim(), TransactionTypeEnum.INCOME.getMessage())) {
@@ -228,9 +252,9 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
             // 当期状态
             record.setCurrentStatus(csvRow.get(7));
             // 交易单号
-            record.setTransactionSn(csvRow.get(8));
+            record.setTransactionSn(csvRow.get(8).trim());
             // 商户单号
-            record.setMerchantOrderSn(csvRow.get(9));
+            record.setMerchantOrderSn(csvRow.get(9).trim());
             // 备注
             record.setRemark(csvRow.get(10));
             record.setCreateTime(new Date());

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,9 +92,9 @@ public class LedgerRecordController {
      *
      * @param ids 交易ID列表
      */
-    @PostMapping("/delete")
-    public Result delete(@RequestBody List<Long> ids) {
-        recordService.removeByIds(ids);
+    @DeleteMapping("/delete/{ids}")
+    public Result delete(@PathVariable("ids") Long[] ids) {
+        recordService.removeByIds(Arrays.asList(ids));
         return Result.succeed();
     }
 
@@ -101,15 +102,15 @@ public class LedgerRecordController {
     /**
      * 微信/支付宝账单导入
      *
-     * @param files     导入ZIP文件
+     * @param file     导入ZIP文件
      * @param password 解压密码
      */
     @PostMapping("/import/third/record")
-    public Result importRecordByThird(@RequestParam(value = "files",required = true) MultipartFile[] files,@RequestParam(value = "password",required = false) String password) {
-        if (ObjectUtils.isEmpty(files)) {
+    public Result importRecordByThird(@RequestParam(value = "file",required = true) MultipartFile file,@RequestParam(value = "password",required = false) String password) {
+        if (ObjectUtils.isEmpty(file)) {
             return Result.failed("文件信息不能为空");
         }
-        recordService.importRecordByThird(files, password);
+        recordService.importRecordByThird(file, password);
         return Result.succeed();
     }
 
