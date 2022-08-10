@@ -122,7 +122,7 @@ public class LedgerRecordController {
     @GetMapping("/query/category/list")
     public Result<List<String>> queryCategoryList() {
         List<LedgerRecord> recordList = recordService.list();
-        List<String> categoryNames = recordList.stream().map(LedgerRecord::getTransactionCategory).collect(Collectors.toList());
+        List<String> categoryNames = recordList.stream().map(LedgerRecord::getTransactionCategory).distinct().collect(Collectors.toList());
         return Result.succeed(categoryNames);
     }
     // TODO 提供导入模板，导入数据
