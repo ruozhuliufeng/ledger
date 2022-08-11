@@ -23,7 +23,7 @@ public class CaptchaFilter extends OncePerRequestFilter{
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String url = request.getRequestURI();
-        if ("/login".equals(url) && request.getMethod().equals("POST")) {
+        if ("/api/login".equals(url) && request.getMethod().equals("POST")) {
             try {
                 // 校验验证码
                 validate(request);
@@ -39,7 +39,7 @@ public class CaptchaFilter extends OncePerRequestFilter{
         String code = httpServletRequest.getParameter("code");
         String key = httpServletRequest.getParameter("token");
         if (StringUtils.isBlank(code) || StringUtils.isBlank(key)){
-            throw new CaptchaException("验证码错误");
+            throw new CaptchaException("验证码不能为空");
         }
         if (!code.equals(redisUtil.hget(LedgerConstant.CAPTCHA_KEY, key))){
             throw new CaptchaException("验证码错误");
