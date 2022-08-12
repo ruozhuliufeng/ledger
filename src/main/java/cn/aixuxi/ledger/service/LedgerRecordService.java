@@ -17,8 +17,7 @@ public interface LedgerRecordService extends IService<LedgerRecord> {
 
     /**
      * 查询报表信息
-     * @param query 时间范围
      * @return 报表信息
      */
-    LedgerReportVO queryReport(LedgerQuery query);
+    LedgerReportVO queryReport();
 }

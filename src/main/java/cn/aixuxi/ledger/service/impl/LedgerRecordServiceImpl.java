@@ -149,19 +149,18 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
     /**
      * 查询报表信息
      *
-     * @param query 时间范围
      * @return 报表信息
      */
     @Override
-    public LedgerReportVO queryReport(LedgerQuery query) {
+    public LedgerReportVO queryReport() {
         LedgerReportVO reportVO = new LedgerReportVO();
         Long userId = secureUtil.getUserId();
-        List<LedgerReportDTO> incomeRatioList = this.baseMapper.queryIncomeRatioReport(query,userId);
-        List<LedgerReportDTO> expenseRatioList = this.baseMapper.queryExpenseRatioReport(query,userId);
-        List<LedgerReportDTO> otherRatioList = this.baseMapper.queryOtherRatioReport(query,userId);
-        List<LedgerReportDTO> recentIncomeList = this.baseMapper.queryRecentIncomeReport(query,userId);
-        List<LedgerReportDTO> recentExpenseList = this.baseMapper.queryRecentExpenseReport(query,userId);
-        List<LedgerReportDTO> recentOtherList = this.baseMapper.queryRecentOtherReport(query,userId);
+        List<LedgerReportDTO> incomeRatioList = this.baseMapper.queryIncomeRatioReport(userId);
+        List<LedgerReportDTO> expenseRatioList = this.baseMapper.queryExpenseRatioReport(userId);
+        List<LedgerReportDTO> otherRatioList = this.baseMapper.queryOtherRatioReport(userId);
+        List<LedgerReportDTO> recentIncomeList = this.baseMapper.queryRecentIncomeReport(userId);
+        List<LedgerReportDTO> recentExpenseList = this.baseMapper.queryRecentExpenseReport(userId);
+        List<LedgerReportDTO> recentOtherList = this.baseMapper.queryRecentOtherReport(userId);
         reportVO.setIncomeRatioList(incomeRatioList);
         reportVO.setExpenseRatioList(expenseRatioList);
         reportVO.setOtherRatioList(otherRatioList);

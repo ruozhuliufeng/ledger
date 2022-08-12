@@ -83,12 +83,11 @@ public class BaseController {
 
     /**
      * 报表信息查询
-     * @param query 时间范围
      * @return 报表信息
      */
-    @PostMapping("/query/report")
-    public Result<LedgerReportVO> queryReport(@RequestBody LedgerQuery query){
-        LedgerReportVO reportVO = recordService.queryReport(query);
+    @GetMapping("/query/report")
+    public Result<LedgerReportVO> queryReport(){
+        LedgerReportVO reportVO = recordService.queryReport();
         return Result.succeed(reportVO);
     }
 }

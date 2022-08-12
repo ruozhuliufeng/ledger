@@ -41,6 +41,8 @@ spring:
     name: ledger
 mybatis-plus:
     mapper-locations: classpath*:/mapper/**Mapper.xml
+    configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #开启sql日志
 ledger:
   jwt:
     expire: 604800 #7天，秒单位
