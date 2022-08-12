@@ -1,6 +1,8 @@
 package cn.aixuxi.ledger.mapper;
 
+import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
+import cn.aixuxi.ledger.vo.LedgerQuery;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import java.util.List;
@@ -15,4 +17,47 @@ public interface LedgerRecordMapper extends BaseMapper<LedgerRecord> {
      * @param list 数据列表
      */
     int saveOrUpdateRecordList(@Param("list") List<LedgerRecord> list);
+
+    /**
+     * 查询收入信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryIncomeRatioReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
+    /**
+     * 查询支出信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryExpenseRatioReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
+    /**
+     * 查询其他信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryOtherRatioReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
+    /**
+     * 查询最近收入信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryRecentIncomeReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
+    /**
+     * 查询最近支出信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryRecentExpenseReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
+    /**
+     * 查询最近其他信息
+     * @param query 时间范围
+     * @param userId 操作用户ID
+     * @return 支出信息
+     */
+    List<LedgerReportDTO> queryRecentOtherReport(@Param("query") LedgerQuery query, @Param("userId") Long userId);
 }

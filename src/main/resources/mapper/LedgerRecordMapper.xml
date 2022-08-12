@@ -48,4 +48,55 @@
         update_time = values(update_time),
         update_user = values(update_user)
     </insert>
+    <select id="queryIncomeRatioReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "transaction_category" as "name",
+               SUM("amount")          as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 0
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime}
+        GROUP BY "transaction_category"
+    </select>
+    <select id="queryExpenseRatioReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "transaction_category" as "name",
+               SUM("amount")          as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 1
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime}
+        GROUP BY "transaction_category"
+    </select>
+    <select id="queryOtherRatioReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "transaction_category" as "name",
+               SUM("amount")          as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 2
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime}
+        GROUP BY "transaction_category"
+    </select>
+    <select id="queryRecentIncomeReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "product_name" as "name",
+               "amount"       as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 0
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime} LIMIT 10
+    </select>
+    <select id="queryRecentExpenseReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "product_name" as "name",
+               "amount"       as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 1
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime} LIMIT 10
+    </select>
+    <select id="queryRecentOtherReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT "product_name" as "name",
+               "amount"       as "value"
+        FROM ledger_record
+        WHERE "user_id" = #{userId}
+          AND "transaction_type" = 2
+          AND "transaction_time" BETWEEN #{query.startTime} AND #{query.endTime} LIMIT 10
+    </select>
 </mapper>

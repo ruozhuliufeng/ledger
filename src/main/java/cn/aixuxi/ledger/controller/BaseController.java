@@ -4,21 +4,17 @@ import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.constant.LedgerConstant;
 import cn.aixuxi.ledger.dto.PassDTO;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
+import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.RedisUtil;
-//import com.google.code.kaptcha.Producer;
+import cn.aixuxi.ledger.vo.LedgerQuery;
+import cn.aixuxi.ledger.vo.LedgerReportVO;
 import com.wf.captcha.SpecCaptcha;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import sun.misc.BASE64Encoder;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.Date;
@@ -40,6 +36,7 @@ public class BaseController {
 //    private final Producer producer;
     private final LedgerUserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final LedgerRecordService recordService;
 
     @GetMapping("/captcha")
     public Result<Map<String,Object>> captcha() throws IOException {
@@ -82,5 +79,16 @@ public class BaseController {
         user.setUpdateTime(new Date());
         userService.updateById(user);
         return Result.succeed();
+    }
+
+    /**
+     * 报表信息查询
+     * @param query 时间范围
+     * @return 报表信息
+     */
+    @PostMapping("/query/report")
+    public Result<LedgerReportVO> queryReport(@RequestBody LedgerQuery query){
+        LedgerReportVO reportVO = recordService.queryReport(query);
+        return Result.succeed(reportVO);
     }
 }

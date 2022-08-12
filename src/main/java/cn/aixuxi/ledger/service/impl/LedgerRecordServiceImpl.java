@@ -1,13 +1,17 @@
 package cn.aixuxi.ledger.service.impl;
 
 import cn.aixuxi.ledger.constant.LedgerConstant;
+import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.enums.TransactionTypeEnum;
 import cn.aixuxi.ledger.mapper.LedgerRecordMapper;
 import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.utils.ZipUtil;
+import cn.aixuxi.ledger.vo.LedgerQuery;
+import cn.aixuxi.ledger.vo.LedgerReportVO;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.csv.CsvData;
@@ -39,6 +43,7 @@ import java.util.List;
 public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, LedgerRecord>
         implements LedgerRecordService {
     private final LedgerUserService userService;
+    private final SecureUtil secureUtil;
 
     @SneakyThrows
     @Override
@@ -139,6 +144,31 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
         record.setCreateTime(new Date());
         record.setUpdateTime(new Date());
         return this.save(record);
+    }
+
+    /**
+     * 查询报表信息
+     *
+     * @param query 时间范围
+     * @return 报表信息
+     */
+    @Override
+    public LedgerReportVO queryReport(LedgerQuery query) {
+        LedgerReportVO reportVO = new LedgerReportVO();
+        Long userId = secureUtil.getUserId();
+        List<LedgerReportDTO> incomeRatioList = this.baseMapper.queryIncomeRatioReport(query,userId);
+        List<LedgerReportDTO> expenseRatioList = this.baseMapper.queryExpenseRatioReport(query,userId);
+        List<LedgerReportDTO> otherRatioList = this.baseMapper.queryOtherRatioReport(query,userId);
+        List<LedgerReportDTO> recentIncomeList = this.baseMapper.queryRecentIncomeReport(query,userId);
+        List<LedgerReportDTO> recentExpenseList = this.baseMapper.queryRecentExpenseReport(query,userId);
+        List<LedgerReportDTO> recentOtherList = this.baseMapper.queryRecentOtherReport(query,userId);
+        reportVO.setIncomeRatioList(incomeRatioList);
+        reportVO.setExpenseRatioList(expenseRatioList);
+        reportVO.setOtherRatioList(otherRatioList);
+        reportVO.setRecentIncomeList(recentIncomeList);
+        reportVO.setRecentExpenseList(recentExpenseList);
+        reportVO.setRecentOtherList(recentOtherList);
+        return reportVO;
     }
 
     /**
