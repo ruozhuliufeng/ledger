@@ -9,6 +9,8 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * 安全工具类
+ *
+ * @author ruozhuliufeng
  */
 @RequiredArgsConstructor
 @Component
