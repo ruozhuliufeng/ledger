@@ -16,13 +16,23 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
 
     /**
      * 解散组织
+     *
      * @param id 组织ID
      */
     Result delete(Long id);
 
     /**
      * 批量删除组织人员
+     *
      * @param tissueUserIds 组织ID列表
      */
     void deleteUser(List<Long> tissueUserIds);
+
+    /**
+     * 查询当前登录用户的组织
+     *
+     * @param tissueType 组织类型
+     * @return 组织列表
+     */
+    List<LedgerTissue> queryFamily(Integer tissueType);
 }

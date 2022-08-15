@@ -7,9 +7,13 @@ import cn.aixuxi.ledger.entity.tissue.LedgerTissueUser;
 import cn.aixuxi.ledger.enums.TissueTypeEnum;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
+import cn.aixuxi.ledger.vo.LedgerTissueUserVO;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 组织-家庭记账控制器
@@ -22,6 +26,13 @@ import org.springframework.web.bind.annotation.*;
 public class LedgerTissueFamilyController {
     private final LedgerTissueService tissueService;
     private final LedgerTissueUserService tissueUserService;
+
+    @GetMapping("/query")
+    public Result<LedgerTissue> queryFamily(){
+        List<LedgerTissue> tissueList = tissueService.queryFamily(TissueTypeEnum.FAMILY.getCode());
+        LedgerTissue tissue = tissueList.stream().findAny().orElse(new LedgerTissue());
+        return Result.succeed(tissue);
+    }
 
     /**
      * 新增家庭信息
@@ -39,9 +50,9 @@ public class LedgerTissueFamilyController {
      * 查询家庭成员列表
      * @return 家庭成员列表
      */
-    @PostMapping("/query/user")
-    public Result queryUser(){
-        return Result.succeed();
+    @GetMapping("/query/user/{tissueId}")
+    public Result<List<LedgerTissueUserVO>> queryUser(@PathVariable("tissueId") Long tissueId) {
+        return tissueUserService.queryUserList(tissueId);
     }
 
     /**
@@ -67,10 +78,11 @@ public class LedgerTissueFamilyController {
     /**
      * 查询待申请的家庭列表
      * @param name 家庭名称
+     * @param code 唯一编码
      * @return 家庭列表
      */
     @PostMapping("/query/list")
-    public Result queryList(@RequestParam("name") String name){
+    public Result queryList(@RequestParam("name") String name,@RequestParam("code") String code){
 
         return Result.succeed();
     }

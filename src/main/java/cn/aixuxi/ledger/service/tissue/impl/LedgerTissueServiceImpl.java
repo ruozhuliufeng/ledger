@@ -19,6 +19,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 服务实现类
@@ -38,7 +39,7 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     public Result<LedgerTissue> saveTissue(LedgerTissue tissue) {
         LedgerUser user = queryUser();
         // 真实姓名及手机号不能为空
-        if (ObjectUtils.isEmpty(user.getPhone()) || ObjectUtils.isEmpty(user.getRealName())){
+        if (ObjectUtils.isEmpty(user.getPhone()) || ObjectUtils.isEmpty(user.getRealName())) {
             return Result.failed("真实姓名及手机号不能为空！");
         }
         tissue.setTissueCode(UUIDUtil.generateShortUuid());
@@ -61,15 +62,15 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     public Result delete(Long id) {
         LedgerTissue tissue = this.getById(id);
         LedgerUser user = queryUser();
-        if (!user.getId().equals(tissue.getTissueLeader())){
+        if (!user.getId().equals(tissue.getTissueLeader())) {
             return Result.failed("只有负责人可以处理该操作！");
         }
         this.baseMapper.deleteById(id);
         // 根据组织ID，获取组织ID内所有人
         List<LedgerTissueUser> tissueUserList = tissueUserService.list(
-                new QueryWrapper<LedgerTissueUser>().eq("tissue_id",id)
+                new QueryWrapper<LedgerTissueUser>().eq("tissue_id", id)
         );
-        if (!CollectionUtils.isEmpty(tissueUserList)){
+        if (!CollectionUtils.isEmpty(tissueUserList)) {
             // TODO 创建通知消息，并保存至数据库
             // 家庭（xxx家庭）已被负责人解散，如有疑问请联系负责人（xxx,10086123456）
             StringBuilder content = new StringBuilder("家庭(");
@@ -90,11 +91,21 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         List<LedgerTissueUser> tissueUserList = tissueUserService.listByIds(tissueUserIds);
         // TODO 创建通知消息，并保存至数据库
         // 您已被负责人从家庭中移出，如有疑问，请及时联系负责人
-        String content = "您已被负责人从家庭中移出，如有疑问，请及时联系负责人("+user.getRealName()+","+user.getPhone()+")";
+        String content = "您已被负责人从家庭中移出，如有疑问，请及时联系负责人(" + user.getRealName() + "," + user.getPhone() + ")";
         tissueUserService.removeByIds(tissueUserIds);
     }
 
-    private LedgerUser queryUser(){
+    @Override
+    public List<LedgerTissue> queryFamily(Integer tissueType) {
+        LedgerUser user = queryUser();
+        List<LedgerTissueUser> tissueUserList = tissueUserService.list(
+                new QueryWrapper<LedgerTissueUser>().eq("user_id", user.getId())
+        );
+        List<Long> tissueIdList = tissueUserList.stream().map(LedgerTissueUser::getTissueId).distinct().collect(Collectors.toList());
+        return this.listByIds(tissueIdList);
+    }
+
+    private LedgerUser queryUser() {
         Long userId = secureUtil.getUserId();
         return userService.getById(userId);
     }
