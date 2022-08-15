@@ -48,3 +48,7 @@ ledger:
     expire: 604800 #7天，秒单位
     secret: ledgerisasimplerecordmoneyprogremandwillbebetter
     header: Authorization
+  smms:
+    username: xxxxx
+    password: xxxxx
+

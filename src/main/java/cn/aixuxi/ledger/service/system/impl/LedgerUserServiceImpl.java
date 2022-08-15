@@ -1,19 +1,27 @@
 package cn.aixuxi.ledger.service.system.impl;
 
+import cn.aixuxi.ledger.constant.LedgerConstant;
 import cn.aixuxi.ledger.entity.system.LedgerMenu;
 import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.mapper.LedgerMenuMapper;
 import cn.aixuxi.ledger.mapper.LedgerUserMapper;
+import cn.aixuxi.ledger.properties.LedgerSmmsProperties;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.RedisUtil;
+import cn.hutool.http.HttpRequest;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 /**
  * 服务实现类
@@ -29,6 +37,7 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
     private final LedgerMenuMapper menuMapper;
     private final RedisUtil redisUtil;
     private final static String GRANTED_AUTHORITY_KEY = "GrantedAuthority:";
+    private final LedgerSmmsProperties smmsProperties;
 
     /**
      * 根据用户名获取用户信息
@@ -112,5 +121,39 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
         userList.forEach(user -> {
             this.clearUserAuthorityInfo(user.getAccount());
         });
+    }
+
+    /**
+     * 头像上传
+     *
+     * @param avatarFile 头像文件
+     * @return 头像路径
+     */
+    @Override
+    public String uploadAvatar(MultipartFile avatarFile) {
+        String token = getSmmsToken();
+        Map<String,Object> params = new HashMap<>();
+        params.put("smfile", avatarFile);
+        String resultBody = HttpRequest.post(LedgerConstant.SM_MS_UPLOAD_IMAGE)
+                .header("Authorization", token)
+                .form(params)
+                .timeout(30000)
+                .execute().body();
+        JSONObject result = JSONUtil.parseObj(resultBody);
+        JSONObject data = result.getJSONObject("data");
+        return data.getStr("url");
+    }
+
+    private String getSmmsToken() {
+        Map<String,Object> params = new HashMap<>();
+        params.put("username",smmsProperties.getUsername());
+        params.put("password",smmsProperties.getPassword());
+        String resultBody = HttpRequest.post(LedgerConstant.SMMS_GET_API_TOKEN)
+                .form(params)
+                .timeout(30000)
+                .execute().body();
+        JSONObject result = JSONUtil.parseObj(resultBody);
+        JSONObject data = result.getJSONObject("data");
+        return data.getStr("token");
     }
 }

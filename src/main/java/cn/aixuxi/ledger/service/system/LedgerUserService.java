@@ -2,6 +2,7 @@ package cn.aixuxi.ledger.service.system;
 
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 用户信息表 Service 接口
@@ -45,4 +46,11 @@ public interface LedgerUserService extends IService<LedgerUser> {
      * @param menuId 菜单id
      */
     void clearUserAuthorityInfoByMenuId(Long menuId);
+
+    /**
+     * 头像上传
+     * @param avatarFile 头像文件
+     * @return 头像路径
+     */
+    String uploadAvatar(MultipartFile avatarFile);
 }

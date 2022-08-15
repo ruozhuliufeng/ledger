@@ -40,4 +40,16 @@ public interface LedgerConstant {
      * 支付宝账单
      */
     String LEDGER_ALIPAY = "alipay";
+    /**
+     * SM.MS API地址
+     */
+    String SMMS_BASIC_API = "https://sm.ms/api/v2/";
+    /**
+     * SM.MS 获取Token地址
+     */
+    String SMMS_GET_API_TOKEN = SMMS_BASIC_API + "/token";
+    /**
+     * SM.MS 上传图片API地址
+     */
+    String SM_MS_UPLOAD_IMAGE = SMMS_BASIC_API + "/upload";
 }

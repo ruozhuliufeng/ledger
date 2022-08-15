@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
@@ -154,4 +155,14 @@ public class LedgerUserController {
         return Result.succeed();
     }
 
+    /**
+     * 上传头像
+     * @param avatarFile   头像文件
+     * @return 头像地址
+     */
+    @PostMapping("/upload/avatar")
+    public Result<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile){
+        String avatarUrl = userService.uploadAvatar(avatarFile);
+        return Result.succeed(avatarUrl);
+    }
 }
