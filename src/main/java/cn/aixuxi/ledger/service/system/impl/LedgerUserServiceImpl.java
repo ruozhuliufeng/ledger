@@ -16,6 +16,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -145,11 +146,9 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
     }
 
     private String getSmmsToken() {
-        Map<String,Object> params = new HashMap<>();
-        params.put("username",smmsProperties.getUsername());
-        params.put("password",smmsProperties.getPassword());
-        String resultBody = HttpRequest.post(LedgerConstant.SMMS_GET_API_TOKEN)
-                .form(params)
+        String url = LedgerConstant.SMMS_GET_API_TOKEN + "?username=" + smmsProperties.getUsername() + "&password=" + smmsProperties.getPassword();
+        String resultBody = HttpRequest.post(url)
+                .keepAlive(true)
                 .timeout(30000)
                 .execute().body();
         JSONObject result = JSONUtil.parseObj(resultBody);

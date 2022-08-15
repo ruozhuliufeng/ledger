@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @author ruozhuliufeng
  */
 @Data
-@ConfigurationProperties("ledger.smms")
+@ConfigurationProperties(prefix = "ledger.smms")
 public class LedgerSmmsProperties {
     /**
      * SM.MS 用户名
