@@ -14,6 +14,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import io.jsonwebtoken.lang.Assert;
 import lombok.AllArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -144,6 +145,7 @@ public class LedgerUserController {
 
     /**
      * 重置密码
+     *
      * @param userId 用户ID
      */
     @PostMapping("/repass")
@@ -157,12 +159,30 @@ public class LedgerUserController {
 
     /**
      * 上传头像
-     * @param avatarFile   头像文件
+     *
+     * @param avatarFile 头像文件
      * @return 头像地址
      */
     @PostMapping("/upload/avatar")
-    public Result<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile){
+    public Result<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) {
         String avatarUrl = userService.uploadAvatar(avatarFile);
         return Result.succeed(avatarUrl);
+    }
+
+    /**
+     * 根据手机号查询用户信息
+     *
+     * @param phone 手机号
+     * @return 用户信息
+     */
+    @PostMapping("/query/user/phone")
+    public Result<LedgerUser> queryUserByPhone(@RequestParam("phone") String phone) {
+        LedgerUser user = userService.getOne(new QueryWrapper<LedgerUser>()
+                .like("phone", phone));
+        if (ObjectUtils.isEmpty(user)) {
+            return Result.failed("该用户未注册或未填写手机号码，请核实");
+        } else {
+            return Result.succeed(user);
+        }
     }
 }

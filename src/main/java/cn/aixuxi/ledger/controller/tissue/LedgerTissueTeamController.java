@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/tissue/family")
+@RequestMapping("/tissue/team")
 public class LedgerTissueTeamController {
     private final LedgerTissueService tissueService;
     private final LedgerTissueUserService tissueUserService;

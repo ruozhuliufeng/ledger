@@ -28,4 +28,8 @@ public class LedgerTissueUser implements Serializable {
      * 用户id
      */
     private Long userId;
+    /**
+     * 昵称
+     */
+    private String nickName;
 }

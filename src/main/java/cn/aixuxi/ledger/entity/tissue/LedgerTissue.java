@@ -1,5 +1,7 @@
 package cn.aixuxi.ledger.entity.tissue;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -12,6 +14,7 @@ public class LedgerTissue implements Serializable {
     /**
      * id
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
      * 组织名称
@@ -24,7 +27,7 @@ public class LedgerTissue implements Serializable {
     /**
      * 组织类型 0:家庭 1:团队
      */
-    private String tissueType;
+    private Integer tissueType;
     /**
      * 组织描述
      */
