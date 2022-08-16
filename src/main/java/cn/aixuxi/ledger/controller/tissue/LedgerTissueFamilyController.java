@@ -1,6 +1,7 @@
 package cn.aixuxi.ledger.controller.tissue;
 
 import cn.aixuxi.ledger.common.Result;
+import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueUser;
@@ -8,11 +9,17 @@ import cn.aixuxi.ledger.enums.TissueTypeEnum;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
 import cn.aixuxi.ledger.vo.LedgerTissueUserVO;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
+import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -26,7 +33,12 @@ import java.util.List;
 public class LedgerTissueFamilyController {
     private final LedgerTissueService tissueService;
     private final LedgerTissueUserService tissueUserService;
+    private final HttpServletRequest request;
 
+    /**
+     * 查询当前登录用户的家庭信息
+     * @return 家庭信息
+     */
     @GetMapping("/query")
     public Result<LedgerTissue> queryFamily(){
         List<LedgerTissue> tissueList = tissueService.queryFamily(TissueTypeEnum.FAMILY.getCode());
@@ -70,33 +82,39 @@ public class LedgerTissueFamilyController {
      * 解散家庭
      * @param id 家庭ID
      */
-    @PostMapping("/delete/{id}")
+    @GetMapping("/delete/{id}")
     public Result delete(@PathVariable("id") Long id){
         return tissueService.delete(id);
     }
 
     /**
      * 查询待申请的家庭列表
-     * @param name 家庭名称
-     * @param code 唯一编码
+     * @param query 查询条件
      * @return 家庭列表
      */
     @PostMapping("/query/list")
-    public Result queryList(@RequestParam("name") String name,@RequestParam("code") String code){
-
-        return Result.succeed();
+    public Result<Page<LedgerTissue>> queryList(@RequestBody LedgerTissueQuery query){
+        int current = ServletRequestUtils.getIntParameter(request, "current", 1);
+        int size = ServletRequestUtils.getIntParameter(request, "size", 10);
+        Page<LedgerTissue> pageData = tissueService.page(new Page<>(current, size),
+                new QueryWrapper<LedgerTissue>()
+                        .like(StrUtil.isNotBlank(query.getName()), "tissue_name", query.getName())
+                        .like(StrUtil.isNotBlank(query.getCode()), "tissue_code", query.getCode())
+                        .eq("tissue_code",TissueTypeEnum.FAMILY.getCode())
+        );
+        return Result.succeed(pageData);
     }
 
     /**
-     * 批量删除家庭成员
-     * @param query ID列表
+     * 删除家庭成员
+     * @param id ID列表
      */
-    @PostMapping("/delete/user/list")
-    public Result deleteUser(@RequestBody LedgerTissueQuery query){
-        if (CollectionUtils.isEmpty(query.getTissueUserIds())){
+    @PutMapping("/delete/user/{id}")
+    public Result deleteUser(@PathVariable("id") Long id){
+        if (ObjectUtils.isEmpty(id)){
             return Result.failed("请选择人员");
         }
-        tissueService.deleteUser(query.getTissueUserIds());
+        tissueService.deleteUser(id);
         return Result.succeed();
     }
 

@@ -85,14 +85,15 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     }
 
     @Override
-    public void deleteUser(List<Long> tissueUserIds) {
+    public void deleteUser(Long tissueUserId) {
         LedgerUser user = queryUser();
         // 获取待删除的组织人员
-        List<LedgerTissueUser> tissueUserList = tissueUserService.listByIds(tissueUserIds);
+        LedgerTissueUser tissueUser = tissueUserService.getById(tissueUserId);
         // TODO 创建通知消息，并保存至数据库
         // 您已被负责人从家庭中移出，如有疑问，请及时联系负责人
         String content = "您已被负责人从家庭中移出，如有疑问，请及时联系负责人(" + user.getRealName() + "," + user.getPhone() + ")";
-        tissueUserService.removeByIds(tissueUserIds);
+        // 删除组织人员
+        tissueUserService.removeById(tissueUserId);
     }
 
     @Override
