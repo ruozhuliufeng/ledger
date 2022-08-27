@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -109,7 +110,13 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
                 new QueryWrapper<LedgerTissueUser>().eq("user_id", user.getId())
         );
         List<Long> tissueIdList = tissueUserList.stream().map(LedgerTissueUser::getTissueId).distinct().collect(Collectors.toList());
-        return this.listByIds(tissueIdList);
+        List<LedgerTissue> list = new ArrayList<>();
+        // 存在组织
+        if (!CollectionUtils.isEmpty(tissueIdList)){
+            list = this.listByIds(tissueIdList);
+            list = list.stream().filter(item->item.getTissueType().equals(tissueType)).collect(Collectors.toList());
+        }
+        return list;
     }
 
     /**
@@ -120,8 +127,8 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
      */
     @Override
     public Result<IPage<LedgerRecord>> queryRecordList(LedgerTissueQuery query) {
-        Page<LedgerRecord> page = new Page<>(query.getCurrent(),query.getSize());
-        List<LedgerRecord> records = recordService.queryRecordListByTissue(query);
+        IPage<LedgerRecord> page = new Page<>(query.getCurrent(),query.getSize());
+        List<LedgerRecord> records = recordService.queryRecordListByTissue(page,query);
         page.setRecords(records);
         return Result.succeed(page);
     }

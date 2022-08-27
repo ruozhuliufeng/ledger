@@ -128,8 +128,7 @@
             )
         </if>
         <if test="query.transactionStartTime != null and query.transactionEndTime != null">
-            and t1."transaction_time" between #{query.transactionStartTime} and #{query.transactionEndTime}
+            and t1.transaction_time between #{query.transactionStartTime} and #{query.transactionEndTime}
         </if>
-        limit #{query.current}, #{query.size}
     </select>
 </mapper>

@@ -9,7 +9,7 @@
                t2.phone                             as phone,
                coalesce(t1.nick_name, t2.nick_name) as nickName
         FROM ledger_tissue_user t1
-                 LEFT JOIN ledger_user t2 on t1.user_id = t2.id
+        LEFT JOIN ledger_user t2 on t1.user_id = t2.id
         WHERE t1.tissue_id = #{tissueId}
     </select>
 </mapper>

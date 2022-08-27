@@ -133,7 +133,7 @@ public class LedgerTissueFamilyController {
      * 家庭记录查询
      * @return 收支记录
      */
-    @GetMapping("/query/record")
+    @PostMapping("/query/record")
     public Result<IPage<LedgerRecord>> queryFamilyRecord(@RequestBody LedgerTissueQuery query){
         if (ObjectUtils.isEmpty(query.getTissueId())){
             return Result.failed("未加入家庭，无收支记录");

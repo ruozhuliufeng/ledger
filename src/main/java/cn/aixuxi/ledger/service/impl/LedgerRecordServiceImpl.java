@@ -20,6 +20,7 @@ import cn.hutool.core.text.csv.CsvReadConfig;
 import cn.hutool.core.text.csv.CsvReader;
 import cn.hutool.core.text.csv.CsvRow;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -174,12 +175,13 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
     /**
      * 查询组织内成员收支列表
      *
+     * @param page  分页信息
      * @param query 查询条件
      * @return 收拾记录
      */
     @Override
-    public List<LedgerRecord> queryRecordListByTissue(LedgerTissueQuery query) {
-        return this.baseMapper.queryRecordListByTissue(query);
+    public List<LedgerRecord> queryRecordListByTissue(IPage<LedgerRecord> page, LedgerTissueQuery query) {
+        return this.baseMapper.queryRecordListByTissue(page, query);
     }
 
     /**
