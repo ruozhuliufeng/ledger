@@ -1,6 +1,7 @@
 package cn.aixuxi.ledger.controller.tissue;
 
 import cn.aixuxi.ledger.common.Result;
+import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
@@ -126,6 +127,18 @@ public class LedgerTissueFamilyController {
     public Result updateUser(@RequestBody LedgerTissueUser tissueUser){
         tissueUserService.updateById(tissueUser);
         return Result.succeed();
+    }
+
+    /**
+     * 家庭记录查询
+     * @return 收支记录
+     */
+    @GetMapping("/query/record")
+    public Result<IPage<LedgerRecord>> queryFamilyRecord(@RequestBody LedgerTissueQuery query){
+        if (ObjectUtils.isEmpty(query.getTissueId())){
+            return Result.failed("未加入家庭，无收支记录");
+        }
+        return tissueService.queryRecordList(query);
     }
 
 }

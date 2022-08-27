@@ -1,7 +1,10 @@
 package cn.aixuxi.ledger.service.tissue;
 
 import cn.aixuxi.ledger.common.Result;
+import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
+import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -35,4 +38,11 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
      * @return 组织列表
      */
     List<LedgerTissue> queryFamily(Integer tissueType);
+
+    /**
+     * 查询组织内成员的收支记录
+     * @param query 查询条件
+     * @return 收支记录
+     */
+    Result<IPage<LedgerRecord>> queryRecordList(LedgerTissueQuery query);
 }

@@ -4,6 +4,7 @@ import cn.aixuxi.ledger.constant.LedgerConstant;
 import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
+import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.enums.TransactionTypeEnum;
 import cn.aixuxi.ledger.mapper.LedgerRecordMapper;
 import cn.aixuxi.ledger.service.LedgerRecordService;
@@ -168,6 +169,17 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
         reportVO.setRecentExpenseList(recentExpenseList);
         reportVO.setRecentOtherList(recentOtherList);
         return reportVO;
+    }
+
+    /**
+     * 查询组织内成员收支列表
+     *
+     * @param query 查询条件
+     * @return 收拾记录
+     */
+    @Override
+    public List<LedgerRecord> queryRecordListByTissue(LedgerTissueQuery query) {
+        return this.baseMapper.queryRecordListByTissue(query);
     }
 
     /**

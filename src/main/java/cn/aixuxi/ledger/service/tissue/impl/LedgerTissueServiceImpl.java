@@ -1,16 +1,21 @@
 package cn.aixuxi.ledger.service.tissue.impl;
 
 import cn.aixuxi.ledger.common.Result;
+import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
+import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueUser;
 import cn.aixuxi.ledger.mapper.LedgerTissueMapper;
+import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
 import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.utils.UUIDUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +39,7 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     private final SecureUtil secureUtil;
     private final LedgerTissueUserService tissueUserService;
     private final LedgerUserService userService;
+    private final LedgerRecordService recordService;
 
     @Override
     public Result<LedgerTissue> saveTissue(LedgerTissue tissue) {
@@ -104,6 +110,20 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         );
         List<Long> tissueIdList = tissueUserList.stream().map(LedgerTissueUser::getTissueId).distinct().collect(Collectors.toList());
         return this.listByIds(tissueIdList);
+    }
+
+    /**
+     * 查询组织内成员的收支记录
+     *
+     * @param query 查询条件
+     * @return 收支记录
+     */
+    @Override
+    public Result<IPage<LedgerRecord>> queryRecordList(LedgerTissueQuery query) {
+        Page<LedgerRecord> page = new Page<>(query.getCurrent(),query.getSize());
+        List<LedgerRecord> records = recordService.queryRecordListByTissue(query);
+        page.setRecords(records);
+        return Result.succeed(page);
     }
 
     private LedgerUser queryUser() {

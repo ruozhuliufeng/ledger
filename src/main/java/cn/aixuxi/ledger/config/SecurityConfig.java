@@ -45,7 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/login",
             "/logout",
             "/base/captcha",
-            "/favicon.ico"
+            "/favicon.ico",
     };
 
     @Override
@@ -70,7 +70,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(URL_WHITELIST).permitAll()
                 .anyRequest()
-                .authenticated()
+                .permitAll()
+//                .authenticated()
 
                 // 异常处理类
                 .and()

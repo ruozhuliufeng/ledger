@@ -2,6 +2,7 @@ package cn.aixuxi.ledger.mapper;
 
 import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
+import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.vo.LedgerQuery;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -68,4 +69,11 @@ public interface LedgerRecordMapper extends BaseMapper<LedgerRecord> {
      * @return 支出信息
      */
     List<LedgerReportDTO> queryRecentOtherReport(@Param("userId") Long userId);
+
+    /**
+     * 查询当前组织内成员的收支记录
+     * @param query 查询参数
+     * @return 收支记录
+     */
+    List<LedgerRecord> queryRecordListByTissue(@Param("query") LedgerTissueQuery query);
 }

@@ -81,5 +81,9 @@ public class LedgerRecord extends BaseEntity {
      * 交易对方账户
      */
     private String counterpartyAccount;
+    /**
+     * 交易人
+     */
+    private String userName;
 
 }
