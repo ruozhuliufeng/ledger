@@ -1,9 +1,13 @@
 package cn.aixuxi.ledger.entity.system;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 消息中心表
@@ -17,11 +21,17 @@ public class LedgerMessage implements Serializable {
     /**
      * id
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
     /**
      * 发送人id
      */
     private Long sendUserId;
+    /**
+     * 发送用户名称
+     */
+    @TableField(exist = false)
+    private String sendUserName;
     /**
      * 消息内容
      */
@@ -31,11 +41,19 @@ public class LedgerMessage implements Serializable {
      */
     private Long receiveUserId;
     /**
-     * 消息状态 0：未处理 1：已确认 2：已拒绝
+     * 消息状态 0：未处理 1：已确认
      */
     private Integer messageStatus;
     /**
      * 消息类型 notice：通知 tissue：组织 。。。。。
      */
     private String messageType;
+    /**
+     * 消息标题
+     */
+    private String messageTitle;
+    /**
+     * 发送时间
+     */
+    private Date sendTime;
 }
