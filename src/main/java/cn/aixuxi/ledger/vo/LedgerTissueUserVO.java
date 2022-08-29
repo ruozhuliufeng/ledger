@@ -2,6 +2,8 @@ package cn.aixuxi.ledger.vo;
 
 import lombok.Data;
 
+import java.util.Date;
+
 /**
  * 组织人员展示VO
  *
@@ -29,4 +31,8 @@ public class LedgerTissueUserVO {
      * 用户ID
      */
     private Long userId;
+    /**
+     * 加入时间
+     */
+    private Date joinTime;
 }

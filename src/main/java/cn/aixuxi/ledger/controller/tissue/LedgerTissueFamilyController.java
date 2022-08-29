@@ -2,25 +2,21 @@ package cn.aixuxi.ledger.controller.tissue;
 
 import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.entity.LedgerRecord;
-import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueUser;
 import cn.aixuxi.ledger.enums.TissueTypeEnum;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
+import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.vo.LedgerTissueUserVO;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.RequiredArgsConstructor;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -34,7 +30,7 @@ import java.util.List;
 public class LedgerTissueFamilyController {
     private final LedgerTissueService tissueService;
     private final LedgerTissueUserService tissueUserService;
-    private final HttpServletRequest request;
+    private final SecureUtil secureUtil;
 
     /**
      * 查询当前登录用户的家庭信息
@@ -95,9 +91,7 @@ public class LedgerTissueFamilyController {
      */
     @PostMapping("/query/list")
     public Result<Page<LedgerTissue>> queryList(@RequestBody LedgerTissueQuery query){
-        int current = ServletRequestUtils.getIntParameter(request, "current", 1);
-        int size = ServletRequestUtils.getIntParameter(request, "size", 10);
-        Page<LedgerTissue> pageData = tissueService.page(new Page<>(current, size),
+        Page<LedgerTissue> pageData = tissueService.page(new Page<>(query.getCurrent(), query.getSize()),
                 new QueryWrapper<LedgerTissue>()
                         .like(StrUtil.isNotBlank(query.getName()), "tissue_name", query.getName())
                         .like(StrUtil.isNotBlank(query.getCode()), "tissue_code", query.getCode())
@@ -141,4 +135,31 @@ public class LedgerTissueFamilyController {
         return tissueService.queryRecordList(query);
     }
 
+
+    /**
+     * 申请加入家庭
+     * @param tissueId 家庭ID
+     */
+    @GetMapping("/apply/join/{tissueId}")
+    public Result applyJoinFamily(@PathVariable("tissueId") Long tissueId){
+        tissueService.applyJoinFamily(tissueId);
+        return Result.succeed("您的申请已提交,请等待负责人员审核。");
+    }
+
+    /**
+     * 邀请加入家庭
+     * @param userId 邀请用户ID
+     * @return
+     */
+    @GetMapping("/invite/join/{userId}")
+    public Result inviteJoinFamily(@PathVariable("userId") Long userId){
+        LedgerTissue tissue = tissueService.getOne(new QueryWrapper<LedgerTissue>()
+                .eq("tissue_leader",secureUtil.getUserId())
+                .eq("tissue_type",TissueTypeEnum.FAMILY.getCode()));
+        if (ObjectUtils.isEmpty(tissue)){
+            return Result.failed("您不是家庭的负责人,请联系负责人处理.");
+        }
+        tissueService.inviteJoinFamily(tissue,userId);
+        return Result.succeed();
+    }
 }

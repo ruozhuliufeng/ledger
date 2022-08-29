@@ -176,7 +176,7 @@ public class LedgerUserController {
      * @param phone 手机号
      * @return 用户信息
      */
-    @PostMapping("/query/user/phone")
+    @GetMapping("/query/user/phone")
     public Result<LedgerUser> queryUserByPhone(@RequestParam("phone") String phone) {
         LedgerUser user = userService.getOne(new QueryWrapper<LedgerUser>()
                 .like("phone", phone));

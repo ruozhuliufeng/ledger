@@ -56,4 +56,8 @@ public class LedgerMessage implements Serializable {
      * 发送时间
      */
     private Date sendTime;
+    /**
+     * 关联业务ID
+     */
+    private Long businessId;
 }

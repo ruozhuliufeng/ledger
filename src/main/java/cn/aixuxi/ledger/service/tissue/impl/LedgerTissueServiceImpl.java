@@ -2,12 +2,17 @@ package cn.aixuxi.ledger.service.tissue.impl;
 
 import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.entity.LedgerRecord;
+import cn.aixuxi.ledger.entity.system.LedgerMessage;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueUser;
+import cn.aixuxi.ledger.enums.MessageStatusEnum;
+import cn.aixuxi.ledger.enums.MessageTemplateEnum;
+import cn.aixuxi.ledger.enums.MessageTypeEnum;
 import cn.aixuxi.ledger.mapper.LedgerTissueMapper;
 import cn.aixuxi.ledger.service.LedgerRecordService;
+import cn.aixuxi.ledger.service.system.LedgerMessageService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
@@ -22,8 +27,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,6 +48,7 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     private final LedgerTissueUserService tissueUserService;
     private final LedgerUserService userService;
     private final LedgerRecordService recordService;
+    private final LedgerMessageService messageService;
 
     @Override
     public Result<LedgerTissue> saveTissue(LedgerTissue tissue) {
@@ -78,15 +86,22 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
                 new QueryWrapper<LedgerTissueUser>().eq("tissue_id", id)
         );
         if (!CollectionUtils.isEmpty(tissueUserList)) {
-            // TODO 创建通知消息，并保存至数据库
-            // 家庭（xxx家庭）已被负责人解散，如有疑问请联系负责人（xxx,10086123456）
-            StringBuilder content = new StringBuilder("家庭(");
-            content.append(tissue.getTissueName())
-                    .append(")已被负责人解散,如有疑问,请及时联系负责人(")
-                    .append(user.getRealName())
-                    .append(",")
-                    .append(user.getPhone())
-                    .append(",)");
+            // 创建通知消息，并保存至数据库
+            List<LedgerMessage> list = new ArrayList<>();
+            tissueUserList.forEach(tissueUser -> {
+                // 创建通知消息，并保存至数据库
+                LedgerMessage message = new LedgerMessage();
+                message.setReceiveUserId(tissueUser.getUserId());
+                message.setSendUserId(user.getId());
+                message.setSendTime(new Date());
+                message.setMessageStatus(MessageStatusEnum.WAIT.getCode());
+                message.setMessageType(MessageTypeEnum.NOTICE.getCode());
+                message.setMessageTitle(MessageTemplateEnum.DISSOLVE_FAMILY.getTitle());
+                message.setMessageContent(String.format(MessageTemplateEnum.DISSOLVE_FAMILY.getContent(), tissue.getTissueName(), user.getRealName(), user.getRealName(), user.getPhone()));
+                message.setBusinessId(tissueUser.getTissueId());
+                list.add(message);
+            });
+            messageService.saveBatch(list);
         }
         return Result.succeed();
     }
@@ -96,9 +111,17 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         LedgerUser user = queryUser();
         // 获取待删除的组织人员
         LedgerTissueUser tissueUser = tissueUserService.getById(tissueUserId);
-        // TODO 创建通知消息，并保存至数据库
-        // 您已被负责人从家庭中移出，如有疑问，请及时联系负责人
-        String content = "您已被负责人从家庭中移出，如有疑问，请及时联系负责人(" + user.getRealName() + "," + user.getPhone() + ")";
+        // 创建通知消息，并保存至数据库
+        LedgerMessage message = new LedgerMessage();
+        message.setReceiveUserId(tissueUser.getUserId());
+        message.setSendUserId(user.getId());
+        message.setSendTime(new Date());
+        message.setMessageStatus(MessageStatusEnum.WAIT.getCode());
+        message.setMessageType(MessageTypeEnum.NOTICE.getCode());
+        message.setMessageTitle(MessageTemplateEnum.REMOVE_FAMILY.getTitle());
+        message.setMessageContent(String.format(MessageTemplateEnum.REMOVE_FAMILY.getContent(), user.getRealName(), user.getPhone()));
+        message.setBusinessId(tissueUser.getTissueId());
+        messageService.save(message);
         // 删除组织人员
         tissueUserService.removeById(tissueUserId);
     }
@@ -112,9 +135,9 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         List<Long> tissueIdList = tissueUserList.stream().map(LedgerTissueUser::getTissueId).distinct().collect(Collectors.toList());
         List<LedgerTissue> list = new ArrayList<>();
         // 存在组织
-        if (!CollectionUtils.isEmpty(tissueIdList)){
+        if (!CollectionUtils.isEmpty(tissueIdList)) {
             list = this.listByIds(tissueIdList);
-            list = list.stream().filter(item->item.getTissueType().equals(tissueType)).collect(Collectors.toList());
+            list = list.stream().filter(item -> item.getTissueType().equals(tissueType)).collect(Collectors.toList());
         }
         return list;
     }
@@ -127,10 +150,49 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
      */
     @Override
     public Result<IPage<LedgerRecord>> queryRecordList(LedgerTissueQuery query) {
-        IPage<LedgerRecord> page = new Page<>(query.getCurrent(),query.getSize());
-        List<LedgerRecord> records = recordService.queryRecordListByTissue(page,query);
+        IPage<LedgerRecord> page = new Page<>(query.getCurrent(), query.getSize());
+        List<LedgerRecord> records = recordService.queryRecordListByTissue(page, query);
         page.setRecords(records);
         return Result.succeed(page);
+    }
+
+    @Override
+    public void applyJoinFamily(Long tissueId) {
+        LedgerTissue tissue = this.getById(tissueId);
+        LedgerUser user = queryUser();
+        // 创建通知消息，并保存至数据库
+        LedgerMessage message = new LedgerMessage();
+        message.setReceiveUserId(tissue.getTissueLeader());
+        message.setSendUserId(user.getId());
+        message.setSendTime(new Date());
+        message.setMessageStatus(MessageStatusEnum.WAIT.getCode());
+        message.setMessageType(MessageTypeEnum.TISSUE.getCode());
+        message.setMessageTitle(MessageTemplateEnum.APPLY_JOIN_FAMILY.getTitle());
+        message.setMessageContent(String.format(MessageTemplateEnum.APPLY_JOIN_FAMILY.getContent(), user.getRealName(), user.getPhone()));
+        message.setBusinessId(tissueId);
+        messageService.save(message);
+    }
+
+    /**
+     * 邀请加入组织
+     *
+     * @param tissue 组织
+     * @param userId 邀请用户ID
+     */
+    @Override
+    public void inviteJoinFamily(LedgerTissue tissue, Long userId) {
+        LedgerUser user = queryUser();
+        // 创建通知消息，并保存至数据库
+        LedgerMessage message = new LedgerMessage();
+        message.setReceiveUserId(userId);
+        message.setSendUserId(user.getId());
+        message.setSendTime(new Date());
+        message.setMessageStatus(MessageStatusEnum.WAIT.getCode());
+        message.setMessageType(MessageTypeEnum.TISSUE.getCode());
+        message.setMessageTitle(MessageTemplateEnum.INVITE_FAMILY.getTitle());
+        message.setMessageContent(String.format(MessageTemplateEnum.INVITE_FAMILY.getContent(), user.getRealName(), user.getPhone(),tissue.getTissueName(),tissue.getTissueCode()));
+        message.setBusinessId(tissue.getId());
+        messageService.save(message);
     }
 
     private LedgerUser queryUser() {

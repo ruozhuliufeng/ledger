@@ -17,6 +17,10 @@ import org.springframework.util.ObjectUtils;
 public class SecureUtil {
     private final LedgerUserService userService;
 
+    /**
+     * 获取用户ID
+     * @return 用户ID
+     */
     public Long getUserId(){
         String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         LedgerUser user = userService.getByUsername(username);
@@ -24,5 +28,18 @@ public class SecureUtil {
             return null;
         }
         return user.getId();
+    }
+
+    /**
+     * 获取用户
+     * @return 用户信息
+     */
+    public LedgerUser getUser(){
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        LedgerUser user = userService.getByUsername(username);
+        if (ObjectUtils.isEmpty(user)){
+            return null;
+        }
+        return user;
     }
 }

@@ -45,4 +45,17 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
      * @return 收支记录
      */
     Result<IPage<LedgerRecord>> queryRecordList(LedgerTissueQuery query);
+
+    /**
+     * 申请加入组织
+     * @param tissueId 组织ID
+     */
+    void applyJoinFamily(Long tissueId);
+
+    /**
+     * 邀请加入组织
+     * @param tissue 组织
+     * @param userId 邀请用户ID
+     */
+    void inviteJoinFamily(LedgerTissue tissue, Long userId);
 }
