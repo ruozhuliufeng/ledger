@@ -8,6 +8,7 @@ import cn.aixuxi.ledger.entity.system.LedgerUserRole;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -121,12 +122,12 @@ public class LedgerUserController {
      * 为用户分配角色
      *
      * @param userId  用户ID
-     * @param roleIds 角色ID列表
+     * @param query 角色ID列表
      */
     @PostMapping("/role/{userId}")
-    public Result rolePerm(@PathVariable("userId") Long userId, @RequestBody Long[] roleIds) {
+    public Result rolePerm(@PathVariable("userId") Long userId, @RequestBody LedgerQuery query) {
         List<LedgerUserRole> userRoles = new ArrayList<>();
-        Arrays.asList(roleIds).forEach(roleId -> {
+        query.getRoleIds().forEach(roleId -> {
             LedgerUserRole userRole = new LedgerUserRole();
             userRole.setUserId(userId);
             userRole.setRoleId(roleId);

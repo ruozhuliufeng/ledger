@@ -8,6 +8,7 @@ import cn.aixuxi.ledger.service.system.LedgerRoleMenuService;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -118,12 +119,12 @@ public class LedgerRoleController {
      * 为角色分配权限
      *
      * @param roleId  角色ID
-     * @param menuIds 菜单ID列表
+     * @param query 菜单ID列表
      */
     @PostMapping("/perms/{roleId}")
-    public Result perms(@PathVariable("roleId") Long roleId, @RequestBody Long[] menuIds) {
+    public Result perms(@PathVariable("roleId") Long roleId,  @RequestBody LedgerQuery query) {
         List<LedgerRoleMenu> roleMenuList = new ArrayList<>();
-        Arrays.asList(menuIds).forEach(menuId -> {
+        query.getMenuIds().forEach(menuId -> {
             LedgerRoleMenu roleMenu = new LedgerRoleMenu();
             roleMenu.setMenuId(menuId);
             roleMenu.setRoleId(roleId);
