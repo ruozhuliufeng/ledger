@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 组织-用户关系表
@@ -32,4 +33,8 @@ public class LedgerTissueUser implements Serializable {
      * 昵称
      */
     private String nickName;
+    /**
+     * 加入时间
+     */
+    private Date joinTime;
 }
