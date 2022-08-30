@@ -5,6 +5,7 @@ import cn.aixuxi.ledger.constant.LedgerConstant;
 import cn.aixuxi.ledger.entity.system.LedgerRole;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.entity.system.LedgerUserRole;
+import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
@@ -173,13 +174,16 @@ public class LedgerUserController {
     /**
      * 根据手机号查询用户信息
      *
-     * @param phone 手机号
+     * @param query 手机号
      * @return 用户信息
      */
-    @GetMapping("/query/user/phone")
-    public Result<LedgerUser> queryUserByPhone(@RequestParam("phone") String phone) {
+    @PostMapping("/query/user/phone")
+    public Result<LedgerUser> queryUserByPhone(@RequestBody LedgerQuery query) {
+        if (ObjectUtils.isEmpty(query.getPhone())){
+            return Result.failed("请输入手机号查询");
+        }
         LedgerUser user = userService.getOne(new QueryWrapper<LedgerUser>()
-                .like("phone", phone));
+                .like("phone", query.getPhone()));
         if (ObjectUtils.isEmpty(user)) {
             return Result.failed("该用户未注册或未填写手机号码，请核实");
         } else {

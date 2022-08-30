@@ -149,7 +149,7 @@ public class LedgerTissueFamilyController {
     /**
      * 邀请加入家庭
      * @param userId 邀请用户ID
-     * @return
+     * @return Result
      */
     @GetMapping("/invite/join/{userId}")
     public Result inviteJoinFamily(@PathVariable("userId") Long userId){
