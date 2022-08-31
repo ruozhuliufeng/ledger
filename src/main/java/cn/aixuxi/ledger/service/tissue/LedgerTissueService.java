@@ -4,6 +4,7 @@ import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissue;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
+import cn.aixuxi.ledger.vo.LedgerTotalVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -41,6 +42,7 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
 
     /**
      * 查询组织内成员的收支记录
+     *
      * @param query 查询条件
      * @return 收支记录
      */
@@ -48,14 +50,24 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
 
     /**
      * 申请加入组织
+     *
      * @param tissueId 组织ID
      */
     void applyJoinFamily(Long tissueId);
 
     /**
      * 邀请加入组织
+     *
      * @param tissue 组织
      * @param userId 邀请用户ID
      */
     void inviteJoinFamily(LedgerTissue tissue, Long userId);
+
+    /**
+     * 获取组织的累计金额
+     *
+     * @param tissueId 组织ID
+     * @return 累计金额信息
+     */
+    LedgerTotalVO queryFamilyTotal(Long tissueId);
 }

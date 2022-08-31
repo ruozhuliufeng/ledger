@@ -18,6 +18,7 @@ import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
 import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.utils.UUIDUtil;
+import cn.aixuxi.ledger.vo.LedgerTotalVO;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -193,6 +194,17 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         message.setMessageContent(String.format(MessageTemplateEnum.INVITE_FAMILY.getContent(), user.getRealName(), user.getPhone(),tissue.getTissueName(),tissue.getTissueCode()));
         message.setBusinessId(tissue.getId());
         messageService.save(message);
+    }
+
+    /**
+     * 获取组织的累计金额
+     *
+     * @param tissueId 组织ID
+     * @return 累计金额信息
+     */
+    @Override
+    public LedgerTotalVO queryFamilyTotal(Long tissueId) {
+        return this.baseMapper.queryFamilyTotal(tissueId);
     }
 
     private LedgerUser queryUser() {

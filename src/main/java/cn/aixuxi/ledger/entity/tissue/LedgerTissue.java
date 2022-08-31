@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @TableName("ledger_tissue")
@@ -36,4 +37,8 @@ public class LedgerTissue implements Serializable {
      * 负责人id
      */
     private Long tissueLeader;
+    /**
+     * 初始金额
+     */
+    private BigDecimal initialAmount;
 }

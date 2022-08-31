@@ -2,4 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="cn.aixuxi.ledger.mapper.LedgerTissueMapper">
 
+    <select id="queryFamilyTotal" resultType="cn.aixuxi.ledger.vo.LedgerTotalVO">
+        select t1.initial_amount                                          as "initialAmount",
+               t2.totalIncomePrice,
+               t3.totalExpendPrice,
+               t1.initial_amount + t2.totalIncomePrice - totalExpendPrice as "totalPrice"
+        from ledger_tissue t1
+                 left join (select t3.tissue_id                as "tissueId",
+                                   SUM(COALESCE(t1.amount, 0)) as "totalIncomePrice"
+                            from ledger_record t1
+                                     left join ledger_user t2 on t1.user_id = t2.id
+                                     left join ledger_tissue_user t3 on t3.user_id = t2.id
+                            where t3.tissue_id = #{tissueId}
+                              and t1.transaction_time > t3.join_time
+                              and t1.transaction_type = 0
+                            group by t3.tissue_id) t2 on t1.id = t2.tissueId
+                 left join (select t3.tissue_id                as "tissueId",
+                                   SUM(COALESCE(t1.amount, 0)) as "totalExpendPrice"
+                            from ledger_record t1
+                                     left join ledger_user t2 on t1.user_id = t2.id
+                                     left join ledger_tissue_user t3 on t3.user_id = t2.id
+                            where t3.tissue_id = #{tissueId}
+                              and t1.transaction_time > t3.join_time
+                              and t1.transaction_type = 1
+                            group by t3.tissue_id) t3 on t1.id = t3.tissueId
+        where t1.id = #{tissueId}
+    </select>
 </mapper>

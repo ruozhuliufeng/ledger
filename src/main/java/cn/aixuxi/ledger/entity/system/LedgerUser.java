@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -73,4 +74,8 @@ public class LedgerUser extends BaseEntity {
      */
     @TableField(exist = false)
     private List<LedgerRole> roles;
+    /**
+     * 初始金额
+     */
+    private BigDecimal initialAmount;
 }

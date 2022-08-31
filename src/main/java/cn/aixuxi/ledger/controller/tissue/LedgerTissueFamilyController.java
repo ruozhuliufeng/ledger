@@ -10,6 +10,7 @@ import cn.aixuxi.ledger.service.tissue.LedgerTissueService;
 import cn.aixuxi.ledger.service.tissue.LedgerTissueUserService;
 import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.vo.LedgerTissueUserVO;
+import cn.aixuxi.ledger.vo.LedgerTotalVO;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -161,5 +162,16 @@ public class LedgerTissueFamilyController {
         }
         tissueService.inviteJoinFamily(tissue,userId);
         return Result.succeed();
+    }
+
+    /**
+     * 获取家庭的累计金额信息
+     * @param tissueId 家庭ID
+     * @return 累计金额信息
+     */
+    @GetMapping("/query/total/{tissueId}")
+    public Result<LedgerTotalVO> queryFamilyTotal(@PathVariable("tissueId") Long tissueId){
+        LedgerTotalVO totalVO = tissueService.queryFamilyTotal(tissueId);
+        return Result.succeed(totalVO);
     }
 }
