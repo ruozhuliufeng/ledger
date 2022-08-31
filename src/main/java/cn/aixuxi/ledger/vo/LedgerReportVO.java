@@ -36,4 +36,13 @@ public class LedgerReportVO implements Serializable {
      * 最近支出
      */
     private List<LedgerReportDTO> recentOtherList;
+    /**
+     * 最近交易信息
+     */
+    private List<LedgerReportDTO> recentTradeList;
+
+    /**
+     * 金额趋势
+     */
+    private List<LedgerReportDTO> amountTradeList;
 }

@@ -9,10 +9,12 @@ import cn.aixuxi.ledger.enums.TransactionTypeEnum;
 import cn.aixuxi.ledger.mapper.LedgerRecordMapper;
 import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.utils.DateUtil;
 import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.utils.ZipUtil;
 import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.aixuxi.ledger.vo.LedgerReportVO;
+import cn.aixuxi.ledger.vo.LedgerTotalVO;
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.csv.CsvData;
@@ -163,12 +165,14 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
         List<LedgerReportDTO> recentIncomeList = this.baseMapper.queryRecentIncomeReport(userId);
         List<LedgerReportDTO> recentExpenseList = this.baseMapper.queryRecentExpenseReport(userId);
         List<LedgerReportDTO> recentOtherList = this.baseMapper.queryRecentOtherReport(userId);
+        List<LedgerReportDTO> recentTradeList = this.baseMapper.queryRecentTradeReport(userId);
         reportVO.setIncomeRatioList(incomeRatioList);
         reportVO.setExpenseRatioList(expenseRatioList);
         reportVO.setOtherRatioList(otherRatioList);
         reportVO.setRecentIncomeList(recentIncomeList);
         reportVO.setRecentExpenseList(recentExpenseList);
         reportVO.setRecentOtherList(recentOtherList);
+        reportVO.setRecentTradeList(recentTradeList);
         return reportVO;
     }
 
@@ -182,6 +186,29 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
     @Override
     public List<LedgerRecord> queryRecordListByTissue(IPage<LedgerRecord> page, LedgerTissueQuery query) {
         return this.baseMapper.queryRecordListByTissue(page, query);
+    }
+
+    /**
+     * 获取登录用户的累计数据
+     *
+     * @return 累计金额
+     */
+    @Override
+    public LedgerTotalVO queryUserTotal() {
+        Long userId = secureUtil.getUserId();
+        return this.baseMapper.queryUserTotal(userId);
+    }
+
+    /**
+     * 获取累计金额报表数据
+     *
+     * @return 累计金额报表
+     */
+    @Override
+    public List<LedgerReportDTO> queryTradeReport() {
+        Long userId = secureUtil.getUserId();
+        List<String> months = DateUtil.getLatest12Month();
+        return this.baseMapper.queryTradeReport(userId,months);
     }
 
     /**

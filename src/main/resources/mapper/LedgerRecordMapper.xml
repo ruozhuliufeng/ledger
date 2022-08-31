@@ -131,4 +131,58 @@
             and t1.transaction_time between #{query.transactionStartTime} and #{query.transactionEndTime}
         </if>
     </select>
+    <select id="queryUserTotal" resultType="cn.aixuxi.ledger.vo.LedgerTotalVO">
+        select t1.initial_amount                                          as "initialAmount",
+               t2.totalIncomePrice,
+               t3.totalExpendPrice,
+               t1.initial_amount + t2.totalIncomePrice - totalExpendPrice as "totalPrice"
+        from ledger_user t1
+                 left join (select t1.user_id                  as "userId",
+                                   SUM(COALESCE(t1.amount, 0)) as "totalIncomePrice"
+                            from ledger_record t1
+                            where t1.user_id = #{userId}
+                              and t1.transaction_type = 0
+                            group by t1.user_id) t2 on t1.id = t2.userId
+                 left join (select t1.user_id                  as "userId",
+                                   SUM(COALESCE(t1.amount, 0)) as "totalExpendPrice"
+                            from ledger_record t1
+                            where t1.user_id = #{userId}
+                              and t1.transaction_type = 1
+                            group by t1.user_id) t3 on t1.id = t3.userId
+        where t1.id = #{userId}
+    </select>
+    <select id="queryRecentTradeReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT case
+                   when product_name = null or product_name = '/' then transaction_category
+                   else product_name end "name",
+               amount as                 "value"
+        FROM ledger_record
+        WHERE user_id = #{userId}
+        ORDER BY transaction_time DESC LIMIT 50
+    </select>
+    <select id="queryTradeReport" resultType="cn.aixuxi.ledger.dto.LedgerReportDTO">
+        SELECT t2.transactionTime                                                                            as "name",
+               sum(t1.initial_amount + COALESCE(t2.totalIncomePrice, 0) - COALESCE(t3.totalExpensePrice, 0)) as "value"
+        FROM ledger_user t1
+                 LEFT JOIN (SELECT t1.user_id                             AS "userId",
+                                   DATE_FORMAT(transaction_time, '%Y-%m') AS "transactionTime",
+                                   SUM(COALESCE(t1.amount, 0))            AS "totalIncomePrice"
+                            FROM ledger_record t1
+                            WHERE t1.user_id = #{userId}
+                              AND t1.transaction_type = 0
+                            GROUP BY t1.user_id,
+                                     DATE_FORMAT(transaction_time, '%Y-%m')) t2 ON t1.id = t2.userId
+                 LEFT JOIN (SELECT t1.user_id                             AS "userId",
+                                   DATE_FORMAT(transaction_time, '%Y-%m') AS "transactionTime",
+                                   SUM(COALESCE(t1.amount, 0))            AS "totalExpensePrice"
+                            FROM ledger_record t1
+                            WHERE t1.user_id = #{userId}
+                              AND t1.transaction_type = 1
+                            GROUP BY t1.user_id,
+                                     DATE_FORMAT(transaction_time, '%Y-%m')) t3
+                           ON t1.id = t3.userId and t2.transactionTime = t3.transactionTime
+        where t1.id = #{userId}
+        group by t2.transactionTime
+        order by t2.transactionTime desc limit 12
+    </select>
 </mapper>

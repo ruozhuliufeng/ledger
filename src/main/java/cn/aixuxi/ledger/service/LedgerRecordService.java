@@ -1,9 +1,11 @@
 package cn.aixuxi.ledger.service;
 
+import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
 import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.aixuxi.ledger.vo.LedgerReportVO;
+import cn.aixuxi.ledger.vo.LedgerTotalVO;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,4 +37,17 @@ public interface LedgerRecordService extends IService<LedgerRecord> {
      * @return 收拾记录
      */
     List<LedgerRecord> queryRecordListByTissue(IPage<LedgerRecord> page, LedgerTissueQuery query);
+
+    /**
+     * 获取登录用户的累计数据
+     *
+     * @return 累计金额
+     */
+    LedgerTotalVO queryUserTotal();
+
+    /**
+     * 获取累计金额报表数据
+     * @return 累计金额报表
+     */
+    List<LedgerReportDTO> queryTradeReport();
 }

@@ -11,6 +11,10 @@ import java.math.BigDecimal;
 @Data
 public class LedgerTotalVO implements Serializable{
     /**
+     * 初始金额
+     */
+    private BigDecimal initialAmount;
+    /**
      * 累计收入金额
      */
     private BigDecimal totalIncomePrice;
