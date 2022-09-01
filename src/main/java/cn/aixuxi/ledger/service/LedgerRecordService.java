@@ -1,5 +1,6 @@
 package cn.aixuxi.ledger.service;
 
+import cn.aixuxi.ledger.common.Result;
 import cn.aixuxi.ledger.dto.LedgerReportDTO;
 import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.tissue.LedgerTissueQuery;
@@ -13,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface LedgerRecordService extends IService<LedgerRecord> {
-    void importRecordByThird(MultipartFile file, String password);
+    Result importRecordByThird(MultipartFile file, String password);
 
     /**
      * 新建交易记录

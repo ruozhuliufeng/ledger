@@ -5,11 +5,13 @@ import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.ServletRequestUtils;
@@ -90,11 +92,14 @@ public class LedgerRecordController {
     /**
      * 批量删除交易信息
      *
-     * @param ids 交易ID列表
+     * @param query 交易ID列表
      */
-    @DeleteMapping("/delete/{ids}")
-    public Result delete(@PathVariable("ids") Long[] ids) {
-        recordService.removeByIds(Arrays.asList(ids));
+    @PostMapping("/delete")
+    public Result delete(@RequestBody LedgerQuery query) {
+        if (CollectionUtils.isEmpty(query.getRecordIds())){
+            return Result.failed("请选择记录ID");
+        }
+        recordService.removeByIds(query.getRecordIds());
         return Result.succeed();
     }
 
@@ -110,8 +115,7 @@ public class LedgerRecordController {
         if (ObjectUtils.isEmpty(file)) {
             return Result.failed("文件信息不能为空");
         }
-        recordService.importRecordByThird(file, password);
-        return Result.succeed();
+        return recordService.importRecordByThird(file, password);
     }
 
     /**

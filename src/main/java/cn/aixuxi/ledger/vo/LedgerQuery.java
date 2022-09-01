@@ -24,6 +24,10 @@ public class LedgerQuery {
      */
     private List<Long> menuIds;
     /**
+     * 记录ID列表
+     */
+    private List<Long> recordIds;
+    /**
      * 手机号
      */
     private String phone;
