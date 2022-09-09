@@ -242,8 +242,14 @@ public class LedgerRecordServiceImpl extends ServiceImpl<LedgerRecordMapper, Led
                     record.setTransactionType(TransactionTypeEnum.INCOME.getCode());
                 } else if (StrUtil.equals(transactionType, TransactionTypeEnum.EXPEND.getMessage())) {
                     record.setTransactionType(TransactionTypeEnum.EXPEND.getCode());
-                } else if (StrUtil.equals(transactionType, TransactionTypeEnum.OTHER.getMessage())) {
-                    record.setTransactionType(TransactionTypeEnum.OTHER.getCode());
+                } else if (StrUtil.equals(transactionType, TransactionTypeEnum.OTHER.getMessage())
+                        && csvRow.get(3).trim().contains("转出")) {
+                    // 转出资金，类型为支出
+                    record.setTransactionType(TransactionTypeEnum.EXPEND.getCode());
+                } else if (StrUtil.equals(transactionType, TransactionTypeEnum.OTHER.getMessage())
+                        && !csvRow.get(3).trim().contains("转出")) {
+                    // 非转出资金，类型为收入
+                    record.setTransactionType(TransactionTypeEnum.INCOME.getCode());
                 } else {
                     record.setTransactionType(TransactionTypeEnum.OTHER.getCode());
                 }

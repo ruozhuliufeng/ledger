@@ -53,7 +53,7 @@ public interface LedgerTissueService extends IService<LedgerTissue> {
      *
      * @param tissueId 组织ID
      */
-    void applyJoinFamily(Long tissueId);
+    Result applyJoinFamily(Long tissueId);
 
     /**
      * 邀请加入组织

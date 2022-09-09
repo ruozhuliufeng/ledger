@@ -158,9 +158,12 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
     }
 
     @Override
-    public void applyJoinFamily(Long tissueId) {
+    public Result applyJoinFamily(Long tissueId) {
         LedgerTissue tissue = this.getById(tissueId);
         LedgerUser user = queryUser();
+        if (ObjectUtils.isEmpty(user.getRealName()) || ObjectUtils.isEmpty(user.getPhone())){
+            return Result.failed("您的真实姓名或手机号码不能为空");
+        }
         // 创建通知消息，并保存至数据库
         LedgerMessage message = new LedgerMessage();
         message.setReceiveUserId(tissue.getTissueLeader());
@@ -172,6 +175,7 @@ public class LedgerTissueServiceImpl extends ServiceImpl<LedgerTissueMapper, Led
         message.setMessageContent(String.format(MessageTemplateEnum.APPLY_JOIN_FAMILY.getContent(), user.getRealName(), user.getPhone()));
         message.setBusinessId(tissueId);
         messageService.save(message);
+        return Result.succeed("您的申请已提交，请等待负责人审核处理");
     }
 
     /**

@@ -143,8 +143,7 @@ public class LedgerTissueFamilyController {
      */
     @GetMapping("/apply/join/{tissueId}")
     public Result applyJoinFamily(@PathVariable("tissueId") Long tissueId){
-        tissueService.applyJoinFamily(tissueId);
-        return Result.succeed("您的申请已提交,请等待负责人员审核。");
+        return tissueService.applyJoinFamily(tissueId);
     }
 
     /**

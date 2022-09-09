@@ -183,6 +183,6 @@
                            ON t1.id = t3.userId and t2.transactionTime = t3.transactionTime
         where t1.id = #{userId}
         group by t2.transactionTime
-        order by t2.transactionTime desc limit 12
+        order by t2.transactionTime asc limit 12
     </select>
 </mapper>
