@@ -5,6 +5,7 @@ import cn.aixuxi.ledger.entity.LedgerRecord;
 import cn.aixuxi.ledger.entity.system.LedgerUser;
 import cn.aixuxi.ledger.service.LedgerRecordService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
+import cn.aixuxi.ledger.utils.SecureUtil;
 import cn.aixuxi.ledger.vo.LedgerQuery;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -36,6 +37,7 @@ public class LedgerRecordController {
     private final LedgerRecordService recordService;
     private final LedgerUserService userService;
     private final HttpServletRequest request;
+    private final SecureUtil secureUtil;
 
     /**
      * 交易信息
@@ -57,10 +59,12 @@ public class LedgerRecordController {
      */
     @GetMapping("list")
     public Result<Page<LedgerRecord>> list(String name) {
+        Long userId = secureUtil.getUserId();
         int current = ServletRequestUtils.getIntParameter(request, "current", 1);
         int size = ServletRequestUtils.getIntParameter(request, "size", 10);
         Page<LedgerRecord> pageData = recordService.page(new Page<>(current, size),
                 new QueryWrapper<LedgerRecord>()
+                        .eq("user_id",userId)
                         .like(StrUtil.isNotBlank(name), "name", name));
         return Result.succeed(pageData);
     }

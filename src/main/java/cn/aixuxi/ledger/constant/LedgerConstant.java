@@ -9,6 +9,10 @@ public interface LedgerConstant {
      */
     String CAPTCHA_KEY = "captcha";
     /**
+     * 访客角色编码
+     */
+    String GUEST_ROLE = "guest";
+    /**
      * 状态 - 启用
      */
     Integer STATUS_ON = 0;
