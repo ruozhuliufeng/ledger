@@ -4,6 +4,15 @@
 
 ​	Ledger-一款简单好用的记账系统
 
+## 项目地址
+
+|       名称        |                    地址                     |
+| :---------------: | :-----------------------------------------: |
+|   ledger-github   |   https://github.com/ruozhuliufeng/ledger   |
+|   ledger-gitee    |   https://gitee.com/ruozhuliufeng/ledger    |
+| ledger-vue-github | https://github.com/ruozhuliufeng/ledger-vue |
+| ledger-vue-gitee  | https://gitee.com/ruozhuliufeng/ledger-vue  |
+
 ## 环境
 
 - JDK:JDK 1.8
@@ -46,9 +55,9 @@
 
 ​			<img src="https://resources.jetbrains.com/storage/products/company/brand/logos/jb_beam.png" alt="Jetbrains" height="150"/>    
 
-​			2.后续工作开发
+2. 后续工作开发
 
-- [ ] 首页报表处理
+- [x] 首页报表处理
 
 - [ ] 家庭记账优化
   - 同一用户仅可创建或加入一个家庭

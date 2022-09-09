@@ -47,7 +47,7 @@ public interface LedgerConstant {
     /**
      * SM.MS API地址
      */
-    String SMMS_BASIC_API = "https://sm.ms/api/v2";
+    String SMMS_BASIC_API = "https://smms.app/api/v2";
     /**
      * SM.MS 获取Token地址
      */
