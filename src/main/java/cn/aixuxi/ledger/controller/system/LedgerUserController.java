@@ -168,7 +168,7 @@ public class LedgerUserController {
     @PostMapping("/upload/avatar")
     public Result<String> uploadAvatar(@RequestParam("avatarFile") MultipartFile avatarFile) {
         String avatarUrl = userService.uploadAvatar(avatarFile);
-        return Result.succeed(avatarUrl);
+        return Result.succeed("上传成功",avatarUrl);
     }
 
     /**

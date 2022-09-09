@@ -10,6 +10,7 @@ import cn.aixuxi.ledger.properties.LedgerSmmsProperties;
 import cn.aixuxi.ledger.service.system.LedgerRoleService;
 import cn.aixuxi.ledger.service.system.LedgerUserService;
 import cn.aixuxi.ledger.utils.RedisUtil;
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.http.HttpRequest;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
@@ -18,11 +19,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 /**
  * 服务实现类
@@ -130,24 +134,46 @@ public class LedgerUserServiceImpl extends ServiceImpl<LedgerUserMapper, LedgerU
      * @param avatarFile 头像文件
      * @return 头像路径
      */
+    @SneakyThrows
     @Override
     public String uploadAvatar(MultipartFile avatarFile) {
+        String filename = UUID.randomUUID().toString();
+        // 获取当前路径
+        String path = new File((ResourceUtils.getURL("classpath:").getPath())).getAbsolutePath();
+        String filePath = path + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_STATIC + File.separator + LedgerConstant.UPLOAD_PATH_PREFIX_UPLOAD_FILE + File.separator;
+        File temp = new File(filePath);
+        if (!temp.exists()) {
+            temp.mkdirs();
+        }
+        // 临时文件
+        File localFile = new File(filePath + filename);
+        // 把上传的文件保存到本地
+        avatarFile.transferTo(localFile);
         String token = getSmmsToken();
         Map<String,Object> params = new HashMap<>();
-        params.put("smfile", avatarFile);
+        params.put("smfile", localFile);
+        params.put("format", "json");
         String resultBody = HttpRequest.post(LedgerConstant.SM_MS_UPLOAD_IMAGE)
                 .header("Authorization", token)
+                .header("Content-Type","multipart/form-data")
+                .header("User-Agent", "ledger")
                 .form(params)
                 .timeout(30000)
                 .execute().body();
+        // 删除临时文件
+        FileUtil.del(localFile);
+        // 删除目录
+        FileUtil.del(path);
         JSONObject result = JSONUtil.parseObj(resultBody);
         JSONObject data = result.getJSONObject("data");
         return data.getStr("url");
     }
 
+    @SneakyThrows
     private String getSmmsToken() {
         String url = LedgerConstant.SMMS_GET_API_TOKEN + "?username=" + smmsProperties.getUsername() + "&password=" + smmsProperties.getPassword();
         String resultBody = HttpRequest.post(url)
+                .header("User-Agent", "ledger")
                 .keepAlive(true)
                 .timeout(30000)
                 .execute().body();
