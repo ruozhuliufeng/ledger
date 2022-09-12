@@ -51,4 +51,9 @@ ledger:
   smms:
     username: xxxxx
     password: xxxxx
+  webdav:
+    url: https://yiandrive.com/dav
+    client: xxxxxxx
+    secret: xxxxxxx
+    root-path: ledger
 
