@@ -10,7 +10,7 @@
     </parent>
     <groupId>cn.aixuxi</groupId>
     <artifactId>ledger</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>ledger</name>
     <description>分类账簿-后端服务</description>
     <packaging>jar</packaging>
