@@ -126,6 +126,11 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.fundebug</groupId>
+            <artifactId>fundebug-spring</artifactId>
+            <version>0.3.1</version>
+        </dependency>
     </dependencies>
 
     <build>
